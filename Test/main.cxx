@@ -1,12 +1,11 @@
 
 #include <types.hxx>
-    using __nectar_namespace::char16;
+    using kiss::char16;
     
 #include <stdio.h>
+#include <typeinfo>
 
 int main()
 {
-    char16 c = u"something";
-    
-    
+    printf("%s\n", typeid(decltype(*u"")).name());
 }

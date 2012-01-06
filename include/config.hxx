@@ -30,5 +30,3 @@
   * config.hxx
   *  Configuration defines.
   */
-
-#define __nectar_namespace nonstd

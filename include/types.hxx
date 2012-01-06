@@ -34,39 +34,9 @@
 
 #include "config.hxx"
 
-namespace __nectar_namespace
+namespace kiss
 {
-#if defined(__clang__) || defined(__GNUC__)
-    // fixed width signed integer types
-    typedef signed char int8;
-    typedef short       int16;
-    typedef int         int32;
-    typedef long long   int64;
-    
-    // fixed with unsigned integer types
-    typedef unsigned char      uint8;
-    typedef unsigned short     uint16;
-    typedef unsigned int       uint32;
-    typedef unsigned long long uint64;
-#elif defined(MSVC)
-    // fixed width signed integer types
-    typedef __int8  int8;
-    typedef __int16 int16;
-    typedef __int32 int32;
-    typedef __int64 int64;
-    
-    // fixed width unsigned integer types
-    typedef uint8  unsigned __int8;
-    typedef uint16 unsigned __int16;
-    typedef uint32 unsigned __int32;
-    typedef uint64 unsigned __int64;
-    
-    // fixed width character types, map to UTF-8/16/32
-    typedef char8  char;
-    enum char16  : uint16 {};
-    enum char32  : uint32 {};
-#else
-    // template metaprogramming to find the types of correct widths. Assumes sizes multiple of 8
+    // implementation of TMP type selector
     namespace __implementation
     {
         template<typename T>
@@ -120,14 +90,32 @@ namespace __nectar_namespace
             typedef typename FindSignedType<n>::Type Type;
         };
     }
+
+    // pointer and size types
+    typedef decltype(nullptr) nullpointer;
+    typedef decltype(sizeof(0)) size;
+    typedef decltype((char*)0-(char*)0) ptrdiff;
+    
+    // fixed-width signed integers
     typedef __implementation::Signed<1>::Type int8;
     typedef __implementation::Signed<2>::Type int16;
     typedef __implementation::Signed<4>::Type int32;
     typedef __implementation::Signed<8>::Type int64;
     
+    // fixed width unsigned integers
     typedef __implementation::Unsigned<1>::Type uint8;
     typedef __implementation::Unsigned<2>::Type uint16;
     typedef __implementation::Unsigned<4>::Type uint32;
     typedef __implementation::Unsigned<8>::Type uint64;
+    
+    // UTF character types
+    typedef char     char8;
+#if defined(_MSC_VER) && !defined(__clang__) && !defined(__ICL)
+    // C++11 requires distinct types, but alas
+    typedef wchar_t char16;
+    typedef uint32  char32;
+#else
+    typedef char16_t char16;
+    typedef char32_t char32;
 #endif
 }
