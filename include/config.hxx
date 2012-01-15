@@ -30,3 +30,12 @@
   * config.hxx
   *  Configuration defines.
   */
+
+#ifndef __KISS_CONFIG
+#define __KISS_CONFIG
+
+#ifdef _MSC_VER
+#define constexpr
+#endif
+
+#endif

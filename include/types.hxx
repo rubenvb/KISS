@@ -29,15 +29,19 @@
  /*
   * types.hxx
   *  Basic type definitions.
-  *  Resorts to template tricks if compiler is unknown.
+  *  Metatemplate programming helpers for type transformation.
   */
 
+#ifndef __KISS_TYPES
+#define __KISS_TYPES
+  
 #include "config.hxx"
 
 namespace kiss
 {
-    // implementation of TMP type selector
-    namespace __implementation
+/* Basic types */
+    // implementation of template meta-programming type selector
+    namespace implementation
     {
         template<typename T>
         struct Next;
@@ -92,21 +96,21 @@ namespace kiss
     }
 
     // pointer and size types
-    typedef decltype(nullptr) nullpointer;
-    typedef decltype(sizeof(0)) size;
-    typedef decltype((char*)0-(char*)0) ptrdiff;
+    typedef decltype(nullptr)           nullptr_type;
+    typedef decltype(sizeof(0))         size_type;
+    typedef decltype((char*)0-(char*)0) ptrdiff_type;
     
     // fixed-width signed integers
-    typedef __implementation::Signed<1>::Type int8;
-    typedef __implementation::Signed<2>::Type int16;
-    typedef __implementation::Signed<4>::Type int32;
-    typedef __implementation::Signed<8>::Type int64;
+    typedef implementation::Signed<1>::Type int8;
+    typedef implementation::Signed<2>::Type int16;
+    typedef implementation::Signed<4>::Type int32;
+    typedef implementation::Signed<8>::Type int64;
     
     // fixed width unsigned integers
-    typedef __implementation::Unsigned<1>::Type uint8;
-    typedef __implementation::Unsigned<2>::Type uint16;
-    typedef __implementation::Unsigned<4>::Type uint32;
-    typedef __implementation::Unsigned<8>::Type uint64;
+    typedef implementation::Unsigned<1>::Type uint8;
+    typedef implementation::Unsigned<2>::Type uint16;
+    typedef implementation::Unsigned<4>::Type uint32;
+    typedef implementation::Unsigned<8>::Type uint64;
     
     // UTF character types
     typedef char     char8;
@@ -118,4 +122,45 @@ namespace kiss
     typedef char16_t char16;
     typedef char32_t char32;
 #endif
+
+    
+/* TMP type transformations */
+    // remove_reference
+    template <class T> struct remove_reference      {typedef T type;};
+    template <class T> struct remove_reference<T&>  {typedef T type;};
+    template <class T> struct remove_reference<T&&> {typedef T type;};  
 }
+
+/* This little bit of code above makes any code including <initializer_list>
+    fail to compile so here are the preprocessor defines to prevent double 
+    declaration */
+#if !defined(_LIBCPP_INITIALIZER_LIST) && !defined(_INITIALIZER_LIST)
+#define _LIBCPP_INITIALIZER_LIST
+#define _INITIALIZER_LIST
+/* initialize_list type for brace-intializer-lists
+    C++11 requires this in namespace std, unfortunately */
+namespace std
+{
+    template<class E> class initializer_list {
+    public:
+        typedef E        value_type;
+        typedef const E& reference;
+        typedef const E& const_reference;
+        typedef kiss::size_type size_type;
+        typedef const E* iterator;
+        typedef const E* const_iterator;
+        initializer_list();
+        kiss::size_type size() const;
+        // number of elements
+        const E* begin() const;
+        const E* end() const;
+    };
+    template<class E> const E* begin(initializer_list<E> il)
+    { return il.begin(); }
+    template<class E> const E* end(initializer_list<E> il)
+    { return il.end(); }
+}
+
+
+#endif
+
