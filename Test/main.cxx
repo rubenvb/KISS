@@ -31,14 +31,8 @@
 
 #include <stdio.h>
 
-template<typename T_number>
-struct functor
-{
-    constexpr T_number operator()(const T_number& number)
-    { return number; }
-};
 
 int main()
 {
-    printf( "%e", functor<float>(-1.9f));
+    printf( "%e", kiss::__implementation::asinh(-1.9));
 }

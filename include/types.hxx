@@ -160,7 +160,6 @@ namespace std
     template<class E> const E* end(initializer_list<E> il)
     { return il.end(); }
 }
-
-
 #endif
 
+#endif
