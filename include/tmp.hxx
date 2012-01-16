@@ -27,19 +27,20 @@
  ********************************************************************************************/
  
  /*
-  * config.hxx
-  *  Configuration defines.
+  * tmp.hxx
+  *  Template meta programming constructs
   */
 
-#ifndef __KISS_CONFIG
-#define __KISS_CONFIG
+#ifndef __KISS_TMP
+#define __KISS_TMP
 
-#if !defined(__clang__)
-#define __has_feature(X) 0
-#endif
+#include "config.hxx"
 
-#if defined(_MSC_VER) || (defined(__clang__) && !__has_feature(cxx_constexpr))
-#define constexpr
-#endif
+namespace kiss
+{
+    // enable_if
+    template<bool, typename T = void> struct enable_if {};
+    template<typename T> struct enable_if<true, T> { typedef T type; };
+}
 
 #endif

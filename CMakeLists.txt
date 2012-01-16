@@ -1,10 +1,12 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
 
 project(KISS)
 
 if(MSVC)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
-set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra -pedantic ${CMAKE_CXX_FLAGS}")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra -pedantic ${CMAKE_CXX_FLAGS}")
 endif()
 
 # Library

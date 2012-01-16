@@ -36,6 +36,7 @@
 #define __KISS_TYPES
   
 #include "config.hxx"
+#include "tmp.hxx"
 
 namespace kiss
 {
@@ -123,8 +124,60 @@ namespace kiss
     typedef char32_t char32;
 #endif
 
-    
-/* TMP type transformations */
+
+/*
+ * Type traits
+ */
+    // integral_constant
+    template <class T, T v>
+    struct integral_constant
+    {
+        static 
+#ifdef constexpr
+        const
+#else
+        constexpr
+#endif
+             T result = v;
+        typedef integral_constant<T,v> type;
+        constexpr operator T() { return result; }
+    };
+    // true_type
+    typedef integral_constant<bool, true> true_type;
+    // false_type
+    typedef integral_constant<bool, false> false_type;
+    // remove_const
+    template <class T> struct remove_const          {typedef T type;};
+    template <class T> struct remove_const<const T> {typedef T type;};
+    // remove_volatile
+    template <class T> struct remove_volatile             {typedef T type;};
+    template <class T> struct remove_volatile<volatile T> {typedef T type;};
+    // remove_cv
+    template <class T> struct remove_cv
+    { typedef typename remove_volatile<typename remove_const<T>::type>::type type; };
+    // is_integral
+    namespace __implementation
+    {
+        template <class T_type>
+        struct is_integral : public false_type{};
+        template <> struct is_integral<bool>               : public true_type {};
+        template <> struct is_integral<char>               : public true_type {};
+        template <> struct is_integral<signed char>        : public true_type {};
+        template <> struct is_integral<unsigned char>      : public true_type {};
+        template <> struct is_integral<wchar_t>            : public true_type {};
+        template <> struct is_integral<char16_t>           : public true_type {};
+        template <> struct is_integral<char32_t>           : public true_type {};
+        template <> struct is_integral<short>              : public true_type {};
+        template <> struct is_integral<unsigned short>     : public true_type {};
+        template <> struct is_integral<int>                : public true_type {};
+        template <> struct is_integral<unsigned int>       : public true_type {};
+        template <> struct is_integral<long>               : public true_type {};
+        template <> struct is_integral<unsigned long>      : public true_type {};
+        template <> struct is_integral<long long>          : public true_type {};
+        template <> struct is_integral<unsigned long long> : public true_type {};
+    }
+    template <class T> struct is_integral
+    : public __implementation::is_integral<typename remove_cv<T>::type> {};
     // remove_reference
     template <class T> struct remove_reference      {typedef T type;};
     template <class T> struct remove_reference<T&>  {typedef T type;};

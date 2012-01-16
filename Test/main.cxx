@@ -34,5 +34,5 @@
 
 int main()
 {
-    printf( "%e", kiss::__implementation::asinh(-1.9));
+    printf( "%i", kiss::mod(10,2) );
 }
