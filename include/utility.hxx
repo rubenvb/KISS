@@ -25,14 +25,24 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Ruben Van Boxem.
  ********************************************************************************************/
- 
-#include <math.hxx>
-#include <types.hxx>
 
-#include <stdio.h>
+  /*
+  * utility.hxx
+  *  Utility functions
+  */
 
+#ifndef __KISS_UTILITY
+#define __KISS_UTILITY
 
-int main()
+namespace kiss
 {
-    printf( "%i", kiss::abs(kiss::int8(-128)) );
+    // ffs - index of last bit set
+    int ffs(int i)
+    { return __builtin_ffs(x); }
+    int ffs(long i)
+    { return __builtin_ffsl(x); }
+    int ffs(long long i)
+    { return __builtin_ffsll(x); }
 }
+
+#endif

@@ -31,8 +31,8 @@
   *  main mathematics function header
   */
 
-#ifndef __KISS_MATH_H
-#define __KISS_MATH_H
+#ifndef __KISS_MATH
+#define __KISS_MATH
 
 #include "config.hxx"
 #include "tmp.hxx"
@@ -83,14 +83,14 @@ float tanf(float);
 double tanh(double);
 float tanhf(float);
 // these have no intrinsics
-inline double logl(const long double x) { return log(static_cast<double>(x)); }
-inline double sqrtl(const long double x) { return sqrt(static_cast<double>(x)); }
-inline double acosh(const double x) { return log(x+sqrt(x*x-1)); }
-inline float acoshf(const float x) { return logf(x+sqrtf(x*x-1)); }
-inline long double acoshl(const long double x) { return logl(x+sqrtl(x*x-1)); }
-inline double asinh(const double x) { return log(x+sqrt(x*x+1)); }
-inline float asinhf(const float x) { return logf(x+sqrtf(x*x+1)); }
-inline long double asinhl(const long double x) { return logl(1+sqrtl(x*x+1)); }
+double logl(const long double x) { return log(static_cast<double>(x)); }
+double sqrtl(const long double x) { return sqrt(static_cast<double>(x)); }
+double acosh(const double x) { return log(x+sqrt(x*x-1)); }
+float acoshf(const float x) { return logf(x+sqrtf(x*x-1)); }
+long double acoshl(const long double x) { return logl(x+sqrtl(x*x-1)); }
+double asinh(const double x) { return log(x+sqrt(x*x+1)); }
+float asinhf(const float x) { return logf(x+sqrtf(x*x+1)); }
+long double asinhl(const long double x) { return logl(1+sqrtl(x*x+1)); }
 } // force MSVC to generate intrinsics
 #pragma intrinsic(abs,   fabs,   labs, _abs64, \
                   acos,  acosf,  /*acosl,*/ \
@@ -186,170 +186,183 @@ inline long double asinhl(const long double x) { return logl(1+sqrtl(x*x+1)); }
 namespace kiss
 {
     // absolute value
-    inline constexpr int abs(const int x)
+    constexpr char abs(const char x)
+    { return static_cast<char>(__builtin_abs(x)); }
+    constexpr short abs(const short x)
+    { return static_cast<short>(__builtin_abs(x)); }
+    constexpr int abs(const int x)
     { return __builtin_abs(x); }
-    //#ifndef __clang__
-    inline constexpr long abs(const long x)
+    constexpr long abs(const long x)
     { return __builtin_labs(x); }
-    inline constexpr long long abs(const long long x)
+    constexpr long long abs(const long long x)
     { return __builtin_llabs(x); }
-    //#endif
-    inline constexpr double abs(const double& x)
+    constexpr double abs(const double x)
     { return __builtin_fabs(x); }
-    inline constexpr float abs(const float& x)
+    constexpr float abs(const float x)
     { return __builtin_fabsf(x); }
-    inline constexpr long double abs(const long double& x)
+    constexpr long double abs(const long double x)
     { return __builtin_fabsl(x); }
     // acos = cos^(-1)
-    inline constexpr int acos(const int x)
-    { return static_cast<int>(__builtin_acos(x)); }
-    inline constexpr long acos(const long x)
-    { return static_cast<long>(__builtin_acos(x)); }
-    inline constexpr long long acos(const long long x)
-    { return static_cast<long long>(__builtin_acos(x)); }
-    inline constexpr double acos(const double x)
+    constexpr double acos(const double x)
     { return __builtin_acos(x); }
-    inline constexpr float acos(const float x)
+    constexpr float acos(const float x)
     { return __builtin_acosf(x); }
-    inline constexpr long double acos(const long double x)
+    constexpr long double acos(const long double x)
     { return __builtin_acosl(x); }
     // acosh = cosh^(-1)
-    inline constexpr int acosh(const int x)
-    { return static_cast<int>(__builtin_acosh(x)); }
-    inline constexpr long acosh(const long x)
-    { return static_cast<long>(__builtin_acosh(x)); }
-    inline constexpr long long acosh(const long long x)
-    { return static_cast<long long>(__builtin_acosh(x)); }
-    inline constexpr double acosh(const double x)
+    constexpr double acosh(const double x)
     { return __builtin_acosh(x); }
-    inline constexpr float acoshf(const float x)
+    constexpr float acoshf(const float x)
     { return __builtin_acosf(x); }
-    inline constexpr long double acosh(const long double x)
+    constexpr long double acosh(const long double x)
     { return __builtin_acoshl(x); }
     // asin = sin^(-1)
-    inline constexpr int asin(const int x)
-    { return static_cast<int>(__builtin_asin(x)); }
-    inline constexpr long asin(const long x)
-    { return static_cast<long>(__builtin_asin(x)); }
-    inline constexpr long long asin(const long long x)
-    { return static_cast<long long>(__builtin_asin(x)); }
-    inline constexpr double asin(const double x)
+    constexpr double asin(const double x)
     { return __builtin_asin(x); }
-    inline constexpr float asin(const float x)
+    constexpr float asin(const float x)
     { return __builtin_asinf(x); }
-    inline constexpr long double asin(const long double x)
+    constexpr long double asin(const long double x)
     { return __builtin_asinl(x); }
     // asinh = sinh^(-1)
-    inline constexpr int asinh(const int x)
-    { return static_cast<int>(__builtin_asinh(x)); }
-    inline constexpr long asinh(const long x)
-    { return static_cast<long>(__builtin_asinh(x)); }
-    inline constexpr long long asinh(const long long x)
-    { return static_cast<long long>(__builtin_asinh(x)); }
-    inline constexpr double asinh(const double x)
+    constexpr double asinh(const double x)
     { return __builtin_asinh(x); }
-    inline constexpr float asinh(const float x)
+    constexpr float asinh(const float x)
     { return __builtin_asinhf(x); }
-    inline constexpr long double asinh(const long double x)
+    constexpr long double asinh(const long double x)
     { return __builtin_asinhl(x); }
     // atan = tan^(-1)
-    inline constexpr int atan(const int x)
-    { return static_cast<int>(__builtin_atan(x)); }
-    inline constexpr long atan(const long x)
-    { return static_cast<long>(__builtin_atan(x)); }
-    inline constexpr long long atan(const long long x)
-    { return static_cast<long long>(__builtin_atan(x)); }
-    inline constexpr double atan(const double x)
+    constexpr double atan(const double x)
     { return __builtin_atan(x); }
-    inline constexpr float atan(const float x)
+    constexpr float atan(const float x)
     { return __builtin_atanf(x); }
-    inline constexpr long double atan(const long double x)
+    constexpr long double atan(const long double x)
     { return __builtin_atanl(x); }
     // atan2 = tan2^(-1)
-    inline constexpr int atan2(const int x, const int y)
-    { return static_cast<int>(__builtin_atan2(x, y)); }
-    inline constexpr long atan2(const long x, const long y)
-    { return static_cast<long>(__builtin_atan2(x, y)); }
-    inline constexpr long long atan2(const long long x, const long long y)
-    { return static_cast<long long>(__builtin_atan2(x, y)); }
-    inline constexpr double atan2(const double x, const double y)
+    constexpr double atan2(const double x, const double y)
     { return __builtin_atan2(x, y); }
-    inline constexpr float atan2(const float x, const float y)
+    constexpr float atan2(const float x, const float y)
     { return __builtin_atan2f(x, y); }
-    inline constexpr long double asinh(const long double x, const long double y)
+    constexpr long double asinh(const long double x, const long double y)
     { return __builtin_atan2l(x, y); }
     // ceil: round to +infinity
-    inline constexpr int ceil(const int x)
-    { return x; }
-    inline constexpr long ceil(const long x)
-    { return x; }
-    inline constexpr long long ceil(const long long x)
-    { return x; }
-    inline constexpr double ceil(const double x)
+    constexpr double ceil(const double x)
     { return __builtin_ceil(x); }
-    inline constexpr float ceil(const float x)
+    constexpr float ceil(const float x)
     { return __builtin_ceilf(x); }
-    inline constexpr long double ceil(const long double x)
+    constexpr long double ceil(const long double x)
     { return __builtin_ceill(x); }
     // cosh
-    inline constexpr int cosh(const int x)
-    { return static_cast<int>(__builtin_cosh(x)); }
-    inline constexpr long cosh(const long x)
-    { return static_cast<long>(__builtin_cosh(x)); }
-    inline constexpr long long cosh(const long long x)
-    { return static_cast<long long>(__builtin_cosh(x)); }
-    inline constexpr double cosh(const double x)
+    constexpr double cosh(const double x)
     { return __builtin_cosh(x); }
-    inline constexpr float cosh(const float x)
+    constexpr float cosh(const float x)
     { return __builtin_coshf(x); }
-    inline constexpr long double cosh(const long double x)
+    constexpr long double cosh(const long double x)
     { return __builtin_coshl(x); }
     // cos
-    inline constexpr int cos(const int x)
-    { return static_cast<int>(__builtin_cos(x)); }
-    inline constexpr long cos(const long x)
-    { return static_cast<long>(__builtin_cos(x)); }
-    inline constexpr long long cos(const long long x)
-    { return static_cast<long long>(__builtin_cos(x)); }
-    inline constexpr double cos(const double x)
+    constexpr double cos(const double x)
     { return __builtin_cos(x); }
-    inline constexpr float cos(const float x)
+    constexpr float cos(const float x)
     { return __builtin_cosf(x); }
-    inline constexpr long double cos(const long double x)
+    constexpr long double cos(const long double x)
     { return __builtin_cosl(x); }
     // exp
-    inline constexpr int exp(const int x)
-    { return static_cast<int>(__builtin_exp(x)); }
-    inline constexpr long exp(const long x)
-    { return static_cast<long>(__builtin_exp(x)); }
-    inline constexpr long long exp(const long long x)
-    { return static_cast<long long>(__builtin_exp(x)); }
-    inline constexpr double exp(const double x)
+    constexpr double exp(const double x)
     { return __builtin_exp(x); }
-    inline constexpr float exp(const float x)
+    constexpr float exp(const float x)
     { return __builtin_expf(x); }
-    inline constexpr long double exp(const long double x)
+    constexpr long double exp(const long double x)
     { return __builtin_expl(x); }
+    // exp10
+    #ifndef __clang__
+    constexpr double exp10(const double x)
+    { return __builtin_exp10(x); }
+    constexpr float exp10(const float x)
+    { return __builtin_exp10f(x); }
+    constexpr long double exp10(const long double x)
+    { return __builtin_exp10l(x); }
+    #endif
     // floor: round to -infinity
-    template<typename T> typename kiss::enable_if<kiss::is_integral<T>::result, T>::type
-    inline constexpr floor(const int x)
-    { return x; }
-    inline constexpr double floor(const double x)
+    constexpr double floor(const double x)
     { return __builtin_floor(x); }
-    inline constexpr float floor(const float x)
+    constexpr float floor(const float x)
     { return __builtin_floorf(x); }
-    inline constexpr long double floor(const long double x)
+    constexpr long double floor(const long double x)
     { return __builtin_floorl(x); }
     // mod = (floating point) remainder of x%y
-    template<typename T> typename kiss::enable_if<kiss::is_integral<T>::result, T>::type
-    inline constexpr mod(const T x, const T y)
+    constexpr int mod(const int x, const int y)
     { return x%y; }
-    inline constexpr double mod(const double x, const double y)
+    constexpr unsigned int mod(const unsigned int x, const unsigned int y)
+    { return x%y; }
+    constexpr long mod(const long x, const long y)
+    { return x%y; }
+    constexpr unsigned long mod(const unsigned long x, const unsigned long y)
+    { return x%y; }
+    constexpr long long mod(const long long x, const long long y)
+    { return x%y; }
+    constexpr unsigned long long mod(const unsigned long long x, const unsigned long long y)
+    { return x%y; }
+    constexpr double mod(const double x, const double y)
     { return __builtin_fmod(x, y); }
-    inline constexpr float mod(const float x, const float y)
+    constexpr float mod(const float x, const float y)
     { return __builtin_fmodf(x, y); }
-    inline constexpr long double mod(const long double x, const long double y)
+    constexpr long double mod(const long double x, const long double y)
     { return __builtin_fmodl(x, y); }
+    // log
+    constexpr double log(const double x)
+    { return __builtin_log(x); }
+    constexpr float log(const float x)
+    { return __builtin_logf(x); }
+    constexpr long double log(const long double x)
+    { return __builtin_logl(x); }
+    // log10
+    constexpr double log10(const double x)
+    { return __builtin_log10(x); }
+    constexpr float log10(const float x)
+    { return __builtin_log10f(x); }
+    constexpr long double log10(const long double x)
+    { return __builtin_log10l(x); }
+    // pow
+    constexpr double pow(const double x, const double y)
+    { return __builtin_pow(x, y); }
+    constexpr float pow(const float x, const float y)
+    { return __builtin_powf(x, y); }
+    constexpr long double pow(const long double x, const float y)
+    { return __builtin_powl(x, y); }
+    // sin
+    constexpr double sin(const double x)
+    { return __builtin_sin(x); }
+    constexpr float sin(const float x)
+    { return __builtin_sinf(x); }
+    constexpr long double sin(const long double x)
+    { return __builtin_sinl(x); }
+    // sinh
+    constexpr double sinh(const double x)
+    { return __builtin_sinh(x); }
+    constexpr float sinh(const float x)
+    { return __builtin_sinhf(x); }
+    constexpr long double sinh(const long double x)
+    { return __builtin_sinhl(x); }
+    // sqrt
+    constexpr double sqrt(const double x)
+    { return __builtin_sqrt(x); }
+    constexpr float sqrt(const float x)
+    { return __builtin_sqrtf(x); }
+    constexpr long double sqrt(const long double x)
+    { return __builtin_sqrtl(x); }
+    // tan
+    constexpr double tan(const double x)
+    { return __builtin_tan(x); }
+    constexpr float tan(const float x)
+    { return __builtin_tanf(x); }
+    constexpr long double tan(const long double x)
+    { return __builtin_tanl(x); }
+    // tanh
+    constexpr double tanh(const double x)
+    { return __builtin_tanh(x); }
+    constexpr float tanh(const float x)
+    { return __builtin_tanhf(x); }
+    constexpr long double tanh(const long double x)
+    { return __builtin_tanhl(x); }
 }
 
 // undefine __builtin_* MSVC workarounds
@@ -417,4 +430,5 @@ namespace kiss
 #endif
 
 #endif
+ 
  

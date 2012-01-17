@@ -26,13 +26,18 @@
  * or implied, of Ruben Van Boxem.
  ********************************************************************************************/
  
-#include <math.hxx>
+ /*
+  * math/basic.cxx
+  *  Basic math function tests.
+  */
+
 #include <types.hxx>
-
-#include <stdio.h>
-
+#include <math.hxx>
 
 int main()
 {
-    printf( "%i", kiss::abs(kiss::int8(-128)) );
+    constexpr int8 int8a = -128;
+
+
+    static_assert( 
 }
