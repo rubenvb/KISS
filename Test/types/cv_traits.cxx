@@ -25,15 +25,19 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Ruben Van Boxem.
  ********************************************************************************************/
-
-#include <math.hxx>
-#include <types.hxx>
-    using namespace kiss;
-    
-#include <stdio.h>
  
+ /*
+  * types/numerical_traits.cxx
+  *  Numerical traits
+  */
+
+#include <types.hxx>
+
+class dummy_class{};
+
 int main()
 {
-    printf("%e", kiss::acos(.5));
+    // is_const
     
+
 }

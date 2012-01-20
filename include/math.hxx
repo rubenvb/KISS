@@ -185,30 +185,38 @@ long double asinhl(const long double x) { return logl(1+sqrtl(x*x+1)); }
 
 namespace kiss
 {
+/*
+ * Basic math functions:
+ *  - everything is a template (to be able to match the correct builtins in the fewest lines of code
+ *  - the float-only functions are enable_if'ed to be delete'd and unavailable for integer types to catch common errors
+ */
+    namespace __implementation
+    {
+        // absolute value
+        constexpr int abs(const int x) { return __builtin_abs(x); }
+        constexpr long abs(const long x) { return __builtin_labs(x); }
+        constexpr long long abs<long long>(const long long x) { return __builtin_llabs(x); }
+        constexpr double abs<double>(const double x) { return __builtin_fabs(x); }
+        constexpr float abs<float>(const float x) { return __builtin_fabsf(x); }
+        constexpr long double abs<long double>(const long double x) { return __builtin_fabsl(x); }
+    }
     // absolute value
+    template<typename T> enable_if<is_unsigned<T>(),T>
+    constexpr abs(const T x) { return x; }
+    template<typename T> enable_if<is_integral<T()
     template<typename T> constexpr T abs(const T x) { return x < 0 ? -x : x; }
-    template<typename T> kiss::enable_if<kiss::is_unsigned<T>,T>
-    constexpr abs(const T x)
-    { return x < 0 ? -x : x; }
-    template<typename T> constexpr T abs(const T);
-    template<> constexpr long abs<long>(const long x)
-    { return __builtin_labs(x); }
-    template<> constexpr long long abs<long long>(const long long x)
-    { return __builtin_llabs(x); }
-    template<> constexpr double abs<double>(const double x)
-    { return __builtin_fabs(x); }
-    template<> constexpr float abs<float>(const float x)
-    { return __builtin_fabsf(x); }
-    template<> constexpr long double abs<long double>(const long double x)
-    { return __builtin_fabsl(x); }
     // acos = cos^(-1)
+    template<typename T> enable_if<is_integral<T>(),T> constexpr acos(const T) = delete;
     constexpr double acos(const double x)
     { return __builtin_acos(x); }
     constexpr float acos(const float x)
     { return __builtin_acosf(x); }
     constexpr long double acos(const long double x)
     { return __builtin_acosl(x); }
+    template<typename T> enable_if<is_floating_point<T>(),T>
+    constexpr acos(const T x) { return acos(x); }
     // acosh = cosh^(-1)
+    template<typename
     constexpr double acosh(const double x)
     { return __builtin_acosh(x); }
     constexpr float acoshf(const float x)

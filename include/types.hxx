@@ -159,6 +159,18 @@ namespace kiss
         // remove_cv
         template<typename T> struct remove_cv
         { typedef typename remove_volatile<typename remove_const<T>::type>::type type; };
+        // is_void
+        template<typename T> struct is_void : public false_type {};
+        template<> struct is_void<void> : public true_type {};
+        // is_nullptr
+        template<typename T> struct is_nullptr : public false_type {};
+        template<> struct is_nullptr<nullptr_type> : public true_type {};
+        // is_const
+        template<typename T> struct is_const : public false_type {};
+        template<typename T> struct is_const<T const> : public true_type {};
+        // is_volatile
+        template<typename T> struct is_volatile : public false_type {};
+        template<typename T> struct is_volatile<T volatile> : public true_type {};
         // is_integral
         template<typename T> struct is_integral : public false_type{};
         template<> struct is_integral<bool>               : public true_type {};
@@ -184,13 +196,29 @@ namespace kiss
         // is_signed - only works with numeric types, other types produce ugly errors
         template<typename T> struct is_signed : public integral_constant<bool, T(-1) < T(0)> {};
     }
-    // short forms are to be used
+/*
+ * Short forms: either alias templates or constexpr functions
+ */
+    // remove_const
     template<typename T>
     using remove_const = typename __implementation::remove_const<T>::type;
+    // remove_volatile
     template<typename T>
     using remove_volatile = typename __implementation::remove_volatile<T>::type;
+    // remove_cv
     template<typename T>
     using remove_cv = typename __implementation::remove_cv<T>::type;
+    // is_void
+    template<typename T>
+    constexpr bool is_void() { return __implementation::is_void<remove_cv<T>>::result; }
+    // is_const
+    template<typename T>
+    constexpr bool is_const() { return __implementation::is_const<T>::result; }
+    // is_nullptr
+    template<typename T>
+    constexpr bool is_nullptr() { return __implementation::is_nullptr<T>::result; }
+    template<typename T>
+    constexpr bool is_volatile() { return __implementation::is_volatile<T>::result; }
     template<typename T>
     constexpr bool is_integral() { return __implementation::is_integral<typename __implementation::remove_cv<T>::type>::result; }
     template<typename T> 
@@ -198,9 +226,11 @@ namespace kiss
     template<typename T>
     constexpr bool is_arithmetic() { return is_integral<T>() || is_floating_point<T>(); }
     template<typename T>
-    constexpr bool is_signed() { return __implementation::is_signed<T>::result; }
+    constexpr bool is_signed() { static_assert( is_arithmetic<T>(), "is_signed can only be used on arithmetic types");
+                                 return __implementation::is_signed<T>::result; }
     template<typename T>
-    constexpr bool is_unsigned() { return !__implementation::is_signed<T>::result; }
+    constexpr bool is_unsigned() { static_assert( is_arithmetic<T>(), "is_unsigned can only be used on arithmetic types");
+                                   return !__implementation::is_signed<T>::result; }
     // remove_reference
     template <typename T> struct remove_reference      {typedef T type;};
     template <typename T> struct remove_reference<T&>  {typedef T type;};

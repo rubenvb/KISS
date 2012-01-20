@@ -38,18 +38,21 @@ class dummy_class{};
 int main()
 {
     // integer type test
-    static_assert( kiss::is_integral<kiss::int8>(),   "int8 is not recognized as integral type" );
-    static_assert( kiss::is_integral<kiss::uint8>(),  "uint8 is not recognized as integral type" );
-    static_assert( kiss::is_integral<kiss::int16>(),  "int16 is not recognized as integral type" );
-    static_assert( kiss::is_integral<kiss::uint16>(), "uint16 is not recognized as integral type" );
-    static_assert( kiss::is_integral<kiss::int32>(),  "int32 is not recognized as integral type" );
-    static_assert( kiss::is_integral<kiss::uint32>(), "uint32 is not recognized as integral type" );
-    static_assert( kiss::is_integral<kiss::int64>(),  "int64 is not recognized as integral type" );
-    static_assert( kiss::is_integral<kiss::uint64>(), "uint64 is not recognized as integral type" );
-    static_assert( !kiss::is_integral<float>(),       "float is recognized as integral type" );
-    static_assert( !kiss::is_integral<double>(),      "double is recognized as integral type" );
-    static_assert( !kiss::is_integral<long double>(), "long double is recognized as integral type" );
-    static_assert( !kiss::is_integral<dummy_class>(), "dummy class is recognized as integral type" );
+    static_assert( kiss::is_integral<kiss::int8>(),    "int8 is not recognized as integral type" );
+    static_assert( kiss::is_integral<kiss::uint8>(),   "uint8 is not recognized as integral type" );
+    static_assert( kiss::is_integral<kiss::int16>(),   "int16 is not recognized as integral type" );
+    static_assert( kiss::is_integral<kiss::uint16>(),  "uint16 is not recognized as integral type" );
+    static_assert( kiss::is_integral<kiss::int32>(),   "int32 is not recognized as integral type" );
+    static_assert( kiss::is_integral<kiss::uint32>(),  "uint32 is not recognized as integral type" );
+    static_assert( kiss::is_integral<kiss::int64>(),   "int64 is not recognized as integral type" );
+    static_assert( kiss::is_integral<kiss::uint64>(),  "uint64 is not recognized as integral type" );
+    static_assert( !kiss::is_integral<float>(),        "float is recognized as integral type" );
+    static_assert( !kiss::is_integral<double>(),       "double is recognized as integral type" );
+    static_assert( !kiss::is_integral<long double>(),  "long double is recognized as integral type" );
+    static_assert( !kiss::is_integral<dummy_class>(),  "dummy class is recognized as integral type" );
+    static_assert( !kiss::is_integral<kiss::int8&>(),  "l-reference type is recognized as integral type" );
+    static_assert( !kiss::is_integral<kiss::int8&&>(), "r-value reference type is recognized as integral type" );
+    static_assert( !kiss::is_integral<kiss::int8*>(),  "pointer type is recognized as integral type" );
     // floating point type test
     static_assert( !kiss::is_floating_point<kiss::int8>(),   "int8 is recognized as a floating point type" );
     static_assert( !kiss::is_floating_point<kiss::uint8>(),  "uint8 is recognized as a floating point type" );
@@ -62,44 +65,48 @@ int main()
     static_assert( kiss::is_floating_point<float>(),         "float is not recognized as a floating point type" );
     static_assert( kiss::is_floating_point<double>(),        "double is not recognized as a floating point type" );
     static_assert( kiss::is_floating_point<long double>(),   "long double is not recognized as a floating point type" );
-    static_assert( !kiss::is_floating_point<dummy_class>(),   "dummy class is recognized as a floating point type" );
+    static_assert( !kiss::is_floating_point<dummy_class>(),  "dummy class is recognized as a floating point type" );
+    static_assert( !kiss::is_floating_point<kiss::int8&>(),  "l-reference type is recognized as a floating point type" );
+    static_assert( !kiss::is_floating_point<kiss::int8&&>(), "r-value reference type is recognized as a floating point type" );
+    static_assert( !kiss::is_floating_point<kiss::int8*>(),  "pointer type is recognized as a floating point type" );
     // arithmetic type test
-    static_assert( kiss::is_arithmetic<kiss::int8>(),   "int8 is recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<kiss::uint8>(),  "uint8 is recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<kiss::int16>(),  "int16 is recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<kiss::uint16>(), "uint16 is recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<kiss::int32>(),  "int32 is recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<kiss::uint32>(), "uint32 is recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<kiss::int64>(),  "int64 is recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<kiss::uint64>(), "uint64 is recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<float>(),         "float is not recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<double>(),        "double is not recognized as a floating point type" );
-    static_assert( kiss::is_arithmetic<long double>(),   "long double is not recognized as a floating point type" );
-    static_assert( !kiss::is_arithmetic<dummy_class>(),   "dummy class is recognized as a floating point type" );
+    static_assert( kiss::is_arithmetic<kiss::int8>(),    "int8 is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<kiss::uint8>(),   "uint8 is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<kiss::int16>(),   "int16 is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<kiss::uint16>(),  "uint16 is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<kiss::int32>(),   "int32 is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<kiss::uint32>(),  "uint32 is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<kiss::int64>(),   "int64 is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<kiss::uint64>(),  "uint64 is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<float>(),         "float is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<double>(),        "double is not recognized as an arithmetic type" );
+    static_assert( kiss::is_arithmetic<long double>(),   "long double is not recognized as an arithmetic type" );
+    static_assert( !kiss::is_arithmetic<dummy_class>(),  "dummy class is recognized as an arithmetic type" );
+    static_assert( !kiss::is_arithmetic<kiss::int8&>(),  "dummy class is recognized as an arithmetic type" );
+    static_assert( !kiss::is_arithmetic<kiss::int8&&>(), "dummy class is recognized as an arithmetic type" );
+    static_assert( !kiss::is_arithmetic<kiss::int8*>(),  "dummy class is recognized as an arithmetic type" );
     // signedness
-    static_assert( kiss::is_signed<kiss::int8>(),        "int8 is not recognized as integral type" );
-    static_assert( !kiss::is_signed<kiss::uint8>(),       "uint8 is not recognized as integral type" );
-    static_assert( kiss::is_signed<kiss::int16>(),       "int16 is not recognized as integral type" );
-    static_assert( !kiss::is_signed<kiss::uint16>(),      "uint16 is not recognized as integral type" );
-    static_assert( kiss::is_signed<kiss::int32>(),       "int32 is not recognized as integral type" );
-    static_assert( !kiss::is_signed<kiss::uint32>(),      "uint32 is not recognized as integral type" );
-    static_assert( kiss::is_signed<kiss::int64>(),       "int64 is not recognized as integral type" );
-    static_assert( !kiss::is_signed<kiss::uint64>(),      "uint64 is not recognized as integral type" );
-    static_assert( kiss::is_signed<float>(),       "float is recognized as integral type" );
-    static_assert( kiss::is_signed<double>(),      "double is recognized as integral type" );
-    static_assert( kiss::is_signed<long double>(), "long double is recognized as integral type" );
+    static_assert( kiss::is_signed<kiss::int8>(),    "int8 is not recognized as integral type" );
+    static_assert( !kiss::is_signed<kiss::uint8>(),  "uint8 is not recognized as integral type" );
+    static_assert( kiss::is_signed<kiss::int16>(),   "int16 is not recognized as integral type" );
+    static_assert( !kiss::is_signed<kiss::uint16>(), "uint16 is not recognized as integral type" );
+    static_assert( kiss::is_signed<kiss::int32>(),   "int32 is not recognized as integral type" );
+    static_assert( !kiss::is_signed<kiss::uint32>(), "uint32 is not recognized as integral type" );
+    static_assert( kiss::is_signed<kiss::int64>(),   "int64 is not recognized as integral type" );
+    static_assert( !kiss::is_signed<kiss::uint64>(), "uint64 is not recognized as integral type" );
+    static_assert( kiss::is_signed<float>(),         "float is recognized as integral type" );
+    static_assert( kiss::is_signed<double>(),        "double is recognized as integral type" );
+    static_assert( kiss::is_signed<long double>(),   "long double is recognized as integral type" );
     // unsignedness
-    static_assert( !kiss::is_unsigned<kiss::int8>(),        "int8 is not recognized as integral type" );
-    static_assert( kiss::is_unsigned<kiss::uint8>(),       "uint8 is not recognized as integral type" );
-    static_assert( !kiss::is_unsigned<kiss::int16>(),       "int16 is not recognized as integral type" );
-    static_assert( kiss::is_unsigned<kiss::uint16>(),      "uint16 is not recognized as integral type" );
-    static_assert( !kiss::is_unsigned<kiss::int32>(),       "int32 is not recognized as integral type" );
-    static_assert( kiss::is_unsigned<kiss::uint32>(),      "uint32 is not recognized as integral type" );
-    static_assert( !kiss::is_unsigned<kiss::int64>(),       "int64 is not recognized as integral type" );
-    static_assert( kiss::is_unsigned<kiss::uint64>(),      "uint64 is not recognized as integral type" );
+    static_assert( !kiss::is_unsigned<kiss::int8>(),  "int8 is not recognized as integral type" );
+    static_assert( kiss::is_unsigned<kiss::uint8>(),  "uint8 is not recognized as integral type" );
+    static_assert( !kiss::is_unsigned<kiss::int16>(), "int16 is not recognized as integral type" );
+    static_assert( kiss::is_unsigned<kiss::uint16>(), "uint16 is not recognized as integral type" );
+    static_assert( !kiss::is_unsigned<kiss::int32>(), "int32 is not recognized as integral type" );
+    static_assert( kiss::is_unsigned<kiss::uint32>(), "uint32 is not recognized as integral type" );
+    static_assert( !kiss::is_unsigned<kiss::int64>(), "int64 is not recognized as integral type" );
+    static_assert( kiss::is_unsigned<kiss::uint64>(), "uint64 is not recognized as integral type" );
     static_assert( !kiss::is_unsigned<float>(),       "float is recognized as integral type" );
     static_assert( !kiss::is_unsigned<double>(),      "double is recognized as integral type" );
-    static_assert( !kiss::is_unsigned<long double>(), "long double is recognized as integral type" );
-    // 
-    
+    static_assert( !kiss::is_unsigned<long double>(), "long double is recognized as integral type" );    
 }
