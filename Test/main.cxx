@@ -25,14 +25,20 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Ruben Van Boxem.
  ********************************************************************************************/
- 
-#include <math.hxx>
+
 #include <types.hxx>
-
-#include <stdio.h>
-
-
+    using namespace kiss;
+ 
 int main()
 {
-    printf( "%i", kiss::abs(kiss::int8(-128)) );
+    
+    static_assert( is_integral<signed char>(),        "int8 is not recognized as integral type" );
+    static_assert( is_integral<unsigned char>(),       "uint8 is not recognized as integral type" );
+    static_assert( is_integral<short>(),       "int16 is not recognized as integral type" );
+    static_assert( is_integral<unsigned short>(),      "uint16 is not recognized as integral type" );
+    static_assert( is_integral<int>(),       "int32 is not recognized as integral type" );
+    static_assert( is_integral<unsigned int>(),      "uint32 is not recognized as integral type" );
+    static_assert( !is_integral<float>(),       "float is recognized as integral type" );
+    static_assert( !is_integral<double>(),      "double is recognized as integral type" );
+    static_assert( !is_integral<long double>(), "long double is recognized as integral type" );
 }

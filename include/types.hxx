@@ -125,12 +125,15 @@ namespace kiss
 #endif
 
 /*
+ * Limits
+ */
+/*
  * Type traits - using alias templates
  */
     namespace __implementation
     {
         // integral_constant
-        template<class T, T v>
+        template<typename T, T v>
         struct integral_constant
         {
             static 
@@ -157,7 +160,7 @@ namespace kiss
         template<typename T> struct remove_cv
         { typedef typename remove_volatile<typename remove_const<T>::type>::type type; };
         // is_integral
-        template<class T> struct is_integral : public false_type{};
+        template<typename T> struct is_integral : public false_type{};
         template<> struct is_integral<bool>               : public true_type {};
         template<> struct is_integral<char>               : public true_type {};
         template<> struct is_integral<signed char>        : public true_type {};
@@ -177,7 +180,9 @@ namespace kiss
         template<typename T> struct is_floating_point : public false_type {};
         template<> struct is_floating_point<float> : public true_type {};
         template<> struct is_floating_point<double> : public true_type {};
-
+        template<> struct is_floating_point<long double> : public true_type {};
+        // is_signed - only works with numeric types, other types produce ugly errors
+        template<typename T> struct is_signed : public integral_constant<bool, T(-1) < T(0)> {};
     }
     // short forms are to be used
     template<typename T>
@@ -187,13 +192,19 @@ namespace kiss
     template<typename T>
     using remove_cv = typename __implementation::remove_cv<T>::type;
     template<typename T>
-    constexpr bool is_integral(T) { return __implementation::is_integral<T>::type::result; }
-    template<class T> 
-    constexpr bool is_floating_point(T) { return __implementation::is_floating_point<typename remove_cv<T>::type>::result; }
+    constexpr bool is_integral() { return __implementation::is_integral<typename __implementation::remove_cv<T>::type>::result; }
+    template<typename T> 
+    constexpr bool is_floating_point() { return __implementation::is_floating_point<typename __implementation::remove_cv<T>::type>::result; }
+    template<typename T>
+    constexpr bool is_arithmetic() { return is_integral<T>() || is_floating_point<T>(); }
+    template<typename T>
+    constexpr bool is_signed() { return __implementation::is_signed<T>::result; }
+    template<typename T>
+    constexpr bool is_unsigned() { return !__implementation::is_signed<T>::result; }
     // remove_reference
-    template <class T> struct remove_reference      {typedef T type;};
-    template <class T> struct remove_reference<T&>  {typedef T type;};
-    template <class T> struct remove_reference<T&&> {typedef T type;};  
+    template <typename T> struct remove_reference      {typedef T type;};
+    template <typename T> struct remove_reference<T&>  {typedef T type;};
+    template <typename T> struct remove_reference<T&&> {typedef T type;};
 }
 
 /* This little bit of code above makes any code including <initializer_list>

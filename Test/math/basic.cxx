@@ -37,6 +37,8 @@
 int main()
 {
     constexpr int8 int8a = -128;
+    constexpr int8 int8b = 128;
+    constexpr uint8 uint8a = 256;
 
 
     static_assert( 

@@ -186,21 +186,20 @@ long double asinhl(const long double x) { return logl(1+sqrtl(x*x+1)); }
 namespace kiss
 {
     // absolute value
-    constexpr char abs(const char x)
-    { return static_cast<char>(__builtin_abs(x)); }
-    constexpr short abs(const short x)
-    { return static_cast<short>(__builtin_abs(x)); }
-    constexpr int abs(const int x)
-    { return __builtin_abs(x); }
-    constexpr long abs(const long x)
+    template<typename T> constexpr T abs(const T x) { return x < 0 ? -x : x; }
+    template<typename T> kiss::enable_if<kiss::is_unsigned<T>,T>
+    constexpr abs(const T x)
+    { return x < 0 ? -x : x; }
+    template<typename T> constexpr T abs(const T);
+    template<> constexpr long abs<long>(const long x)
     { return __builtin_labs(x); }
-    constexpr long long abs(const long long x)
+    template<> constexpr long long abs<long long>(const long long x)
     { return __builtin_llabs(x); }
-    constexpr double abs(const double x)
+    template<> constexpr double abs<double>(const double x)
     { return __builtin_fabs(x); }
-    constexpr float abs(const float x)
+    template<> constexpr float abs<float>(const float x)
     { return __builtin_fabsf(x); }
-    constexpr long double abs(const long double x)
+    template<> constexpr long double abs<long double>(const long double x)
     { return __builtin_fabsl(x); }
     // acos = cos^(-1)
     constexpr double acos(const double x)
@@ -244,6 +243,13 @@ namespace kiss
     { return __builtin_atan2f(x, y); }
     constexpr long double asinh(const long double x, const long double y)
     { return __builtin_atan2l(x, y); }
+    // besselj: bessel function of first kind
+    constexpr double besselj(const double x)
+    { return __builtin_j0(x); }
+    constexpr float besselj(const float x)
+    { return __builtin_j0f(x); }
+    constexpr long double besselj(const long double x)
+    { return __builtin_ceill(x); }
     // ceil: round to +infinity
     constexpr double ceil(const double x)
     { return __builtin_ceil(x); }
@@ -272,6 +278,13 @@ namespace kiss
     { return __builtin_expf(x); }
     constexpr long double exp(const long double x)
     { return __builtin_expl(x); }
+    // exp2
+    constexpr double exp2(const double x)
+    { return __builtin_exp2(x); }
+    constexpr float exp2(const float x)
+    { return __builtin_exp2f(x); }
+    constexpr long double exp2(const long double x)
+    { return __builtin_exp2l(x); }
     // exp10
     #ifndef __clang__
     constexpr double exp10(const double x)
@@ -288,6 +301,13 @@ namespace kiss
     { return __builtin_floorf(x); }
     constexpr long double floor(const long double x)
     { return __builtin_floorl(x); }
+    // gamma: gamma function
+    constexpr double gamma(const double x)
+    { return __builtin_gamma(x); }
+    constexpr float gamma(const float x)
+    { return __builtin_gammaf(x); }
+    constexpr long double gamma(const long double x)
+    { return __builtin_gammal(x); }
     // mod = (floating point) remainder of x%y
     constexpr int mod(const int x, const int y)
     { return x%y; }
@@ -326,8 +346,17 @@ namespace kiss
     { return __builtin_pow(x, y); }
     constexpr float pow(const float x, const float y)
     { return __builtin_powf(x, y); }
-    constexpr long double pow(const long double x, const float y)
+    constexpr long double pow(const long double x, const long double y)
     { return __builtin_powl(x, y); }
+    // pow10
+    #ifndef __clang__
+    constexpr double pow10(const double x)
+    { return __builtin_pow10(x); }
+    constexpr float pow10(const float x)
+    { return __builtin_pow10f(x); }
+    constexpr long double pow10(const long double x)
+    { return __builtin_pow10l(x); }
+    #endif
     // sin
     constexpr double sin(const double x)
     { return __builtin_sin(x); }
