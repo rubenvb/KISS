@@ -207,6 +207,26 @@ namespace kiss
         constexpr double acosh(const double x) { return __builtin_acosh(x); }
         constexpr float acoshf(const float x) { return __builtin_acosf(x); }
         constexpr long double acosh(const long double x) { return __builtin_acoshl(x); }
+        // asin = sin^(-1)
+        constexpr double asin(const double x) { return __builtin_asin(x); }
+        constexpr float asin(const float x) { return __builtin_asinf(x); }
+        constexpr long double asin(const long double x) { return __builtin_asinl(x); }
+        // asinh = sinh^(-1)
+        constexpr double asinh(const double x) { return __builtin_asinh(x); }
+        constexpr float asinh(const float x) { return __builtin_asinhf(x); }
+        constexpr long double asinh(const long double x) { return __builtin_asinhl(x); }
+        // atan = tan^(-1)
+        constexpr double atan(const double x) { return __builtin_atan(x); }
+        constexpr float atan(const float x) { return __builtin_atanf(x); }
+        constexpr long double atan(const long double x) { return __builtin_atanl(x); }
+        // atan2 = tan2^(-1)
+        constexpr double atan2(const double x, const double y) { return __builtin_atan2(x, y); }
+        constexpr float atan2(const float x, const float y) { return __builtin_atan2f(x, y); }
+        constexpr long double asinh(const long double x, const long double y) { return __builtin_atan2l(x, y); }
+        // besselj: bessel function of first kind
+        constexpr double besselj(const double x) { return __builtin_j0(x); }
+        constexpr float besselj(const float x) { return __builtin_j0f(x); }
+        constexpr long double besselj(const long double x) { return __builtin_ceill(x); }
     }
     // absolute value
     template<typename T> enable_if<is_unsigned<T>(),T>
@@ -223,33 +243,21 @@ namespace kiss
     template<typename T> enable_if<is_floating_point<T>(),T>
     constexpr acosh(const T x) { return __implementation::acosh(x); }
     // asin = sin^(-1)
-    constexpr double asin(const double x)
-    { return __builtin_asin(x); }
-    constexpr float asin(const float x)
-    { return __builtin_asinf(x); }
-    constexpr long double asin(const long double x)
-    { return __builtin_asinl(x); }
+    template<typename T> enable_if<is_integral<T>(),T> constexpr asin(const T) = delete;
+    template<typename T> enable_if<is_floating_point<T>(),T>
+    constexpr asin(const T x) { return __implementation::asin(x); }
     // asinh = sinh^(-1)
-    constexpr double asinh(const double x)
-    { return __builtin_asinh(x); }
-    constexpr float asinh(const float x)
-    { return __builtin_asinhf(x); }
-    constexpr long double asinh(const long double x)
-    { return __builtin_asinhl(x); }
+    template<typename T> enable_if<is_integral<T>(),T> constexpr asinh(const T) = delete;
+    template<typename T> enable_if<is_floating_point<T>(),T>
+    constexpr asinh(const T x) { return __implementation::asinh(x); }
     // atan = tan^(-1)
-    constexpr double atan(const double x)
-    { return __builtin_atan(x); }
-    constexpr float atan(const float x)
-    { return __builtin_atanf(x); }
-    constexpr long double atan(const long double x)
-    { return __builtin_atanl(x); }
+    template<typename T> enable_if<is_integral<T>(),T> constexpr atan(const T) = delete;
+    template<typename T> enable_if<is_floating_point<T>(),T>
+    constexpr atan(const T x) { return __implementation::atan(x); }
     // atan2 = tan2^(-1)
-    constexpr double atan2(const double x, const double y)
-    { return __builtin_atan2(x, y); }
-    constexpr float atan2(const float x, const float y)
-    { return __builtin_atan2f(x, y); }
-    constexpr long double asinh(const long double x, const long double y)
-    { return __builtin_atan2l(x, y); }
+    template<typename T> enable_if<is_integral<T>(),T> constexpr atan2(const T, const T) = delete;
+    template<typename T> enable_if<is_floating_point<T>(),T>
+    constexpr atan2(const T x, const T y) { return __implementation::atan2(x,y); }
     // besselj: bessel function of first kind
     constexpr double besselj(const double x)
     { return __builtin_j0(x); }

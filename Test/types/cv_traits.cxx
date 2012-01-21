@@ -38,6 +38,21 @@ class dummy_class{};
 int main()
 {
     // is_const
+    static_assert( !kiss::is_const<dummy_class>(),               "dummy_class is recognized as const" );
+    static_assert( kiss::is_const<const dummy_class>(),          "const dummy_class not recognized as const" );
+    static_assert( !kiss::is_const<const dummy_class&>(),        "const dummy_class& recognized as const" );
+    static_assert( !kiss::is_const<dummy_class const*>(),        "dummy_class const* recognized as const" );
+    static_assert( kiss::is_const<dummy_class *const>(),        "dummy_class *const not recognized as const" );
+    static_assert( kiss::is_const<dummy_class const *const>(),  "dummy_class const *const not recognized as const" );
+    static_assert( kiss::is_const<const volatile dummy_class>(), "const volatile dummy_class is not recognized as const" );
+    // is_volatile
+    static_assert( !kiss::is_volatile<dummy_class>(),                   "dummy_class is recognized as volatile" );
+    static_assert( kiss::is_volatile<volatile dummy_class>(),           "volatile dummy_class not recognized as volatile" );
+    static_assert( !kiss::is_volatile<volatile dummy_class&>(),         "volatile dummy_class& recognized as volatile" );
+    static_assert( !kiss::is_volatile<dummy_class volatile*>(),         "dummy_class volatile* recognized as volatile" );
+    static_assert( kiss::is_volatile<dummy_class *volatile>(),          "dummy_class *volatile not recognized as volatile" );
+    static_assert( kiss::is_volatile<dummy_class volatile *volatile>(), "dummy_class volatile *volatile not recognized as volatile" );
+    static_assert( kiss::is_volatile<const volatile dummy_class>(),     "const volatile dummy_class is recognized as volatile" );
     
 
 }
