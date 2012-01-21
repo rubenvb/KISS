@@ -38,6 +38,12 @@ class dummy_class
     void member_function();
     static void static_function();
 };
+void f() {return;};
+void ff(...);
+const int g(int);
+const volatile char gg(...);
+auto l = [](){};
+auto fp = &f;
 
 int main()
 {
@@ -76,4 +82,12 @@ int main()
     static_assert( !kiss::is_pointer<dummy_class&&>(),           "dummy_class&& recognized as pointer" );
     static_assert( !kiss::is_pointer<dummy_class*&>(),            "dummy_class*& recognized as pointer" );
     
+    // is_function
+    static_assert( !kiss::is_function<char>(),         "char recognized as function" );
+    static_assert( !kiss::is_function<decltype(l)>(),  "lambda recognized as function" );
+    static_assert( !kiss::is_function<decltype(fp)>(), "function pointer recognized as function" );
+    static_assert( kiss::is_function<decltype(f)>(),   "void function not recognized as a function" );
+    static_assert( kiss::is_function<decltype(ff)>(),  "void variadic function not recognized as a function" );
+    static_assert( kiss::is_function<decltype(g)>(),   "normal function not recognized as a function" );
+    static_assert( kiss::is_function<decltype(gg)>(),  "const volatile function not recognized as a function" );
 }

@@ -200,6 +200,16 @@ namespace kiss
         // is_pointer
         template<typename T> struct is_pointer : public false_type {};
         template<typename T> struct is_pointer<T*> : public true_type {};
+        // is_lvalue_reference
+        template<typename T> struct is_lvalue_reference : public false_type {};
+        template<typename T> struct is_lvalue_reference<T&> : public true_type {};
+        // is_rvalue_reference
+        template<typename T> struct is_rvalue_reference : public false_type {};
+        template<typename T> struct is_rvalue_reference<T&&> : public true_type {};
+        // is_function - ugliness ahead due to variadic functions!
+        template<typename T, typename... Args> struct is_function : public false_type {};
+        template<typename T, typename... Args> struct is_function<T(Args...)> : public true_type {}; // normal function
+        template<typename T, typename... Args> struct is_function<T(Args......)> : public true_type {}; // variadic function        
         // is_signed - only works with numeric types, other types produce ugly errors
         template<typename T> struct is_signed : public integral_constant<bool, T(-1) < T(0)> {};
         // remove_reference
@@ -243,6 +253,31 @@ namespace kiss
     // is_pointer
     template<typename T>
     constexpr bool is_pointer() { return __implementation::is_pointer<typename __implementation::remove_cv<T>::type>::result; }
+    // is_lvalue_reference
+    template<typename T>
+    constexpr bool is_lvalue_reference() { return __implementation::is_lvalue_reference<T>::result; }
+    // is_rvalue_reference
+    template<typename T>
+    constexpr bool is_rvalue_reference() { return __implementation::is_rvalue_reference<T>::result; }
+    // is_reference
+    template<typename T>
+    constexpr bool is_reference() { return __implementation::is_rvalue_reference<T>::result || __implementation::is_lvalue_reference<T>::result; }
+    // is_member_object_pointer
+    //TODO
+    // is_member_function_pointer
+    //TODO
+    // is_enum
+    template<typename T>
+    constexpr bool is_enum() { return __is_enum(typename __implementation::remove_cv<T>::type); }
+    // is_union
+    template<typename T>
+    constexpr bool is_union() { return __is_union(typename __implementation::remove_cv<T>::type); }
+    // is_class
+    template<typename T>
+    constexpr bool is_class() { return __is_class(typename __implementation::remove_cv<T>::type); }
+    // is_function
+    template<typename T>
+    constexpr bool is_function() { return __implementation::is_function<typename __implementation::remove_cv<T>::type>::result; }
     // is_arithmetic
     template<typename T>
     constexpr bool is_arithmetic() { return is_integral<T>() || is_floating_point<T>(); }

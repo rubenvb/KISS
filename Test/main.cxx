@@ -26,14 +26,13 @@
  * or implied, of Ruben Van Boxem.
  ********************************************************************************************/
 
-#include <math.hxx>
+#include <stdio.h>
 #include <types.hxx>
     using namespace kiss;
     
-#include <stdio.h>
+
  
 int main()
 {
-    printf("%e", kiss::acos(.5));
-    
+
 }

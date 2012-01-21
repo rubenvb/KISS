@@ -22,6 +22,7 @@ add_executable(test_KISS Test/main.cxx)
 # tests
 enable_testing()
 set(TEST_DIR "${KISS_SOURCE_DIR}/Test")
+add_test("types/compiler_traits" ${CMAKE_CXX_COMPILER} "${TEST_DIR}/types/compiler_traits.cxx" -I${KISS_SOURCE_DIR}/include -std=c++11 -ocompiler_traits)
 add_test("types/cv_traits" ${CMAKE_CXX_COMPILER} "${TEST_DIR}/types/cv_traits.cxx" -I${KISS_SOURCE_DIR}/include -std=c++11 -ocv_traits)
 add_test("types/misc_traits" ${CMAKE_CXX_COMPILER} "${TEST_DIR}/types/misc_traits.cxx" -I${KISS_SOURCE_DIR}/include -std=c++11 -omisc_traits)
 add_test("types/numerical_traits" ${CMAKE_CXX_COMPILER} "${TEST_DIR}/types/numerical_traits.cxx" -I${KISS_SOURCE_DIR}/include -std=c++11 -onumerical_traits)
