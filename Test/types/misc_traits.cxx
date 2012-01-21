@@ -36,6 +36,7 @@
 class dummy_class
 {
     void member_function();
+public:
     static void static_function();
 };
 void f() {return;};
@@ -84,6 +85,8 @@ int main()
     
     // is_function
     static_assert( !kiss::is_function<char>(),         "char recognized as function" );
+    static_assert( kiss::is_function<
+            decltype(dummy_class::static_function)>(), "static member function recognized as function" );
     static_assert( !kiss::is_function<decltype(l)>(),  "lambda recognized as function" );
     static_assert( !kiss::is_function<decltype(fp)>(), "function pointer recognized as function" );
     static_assert( kiss::is_function<decltype(f)>(),   "void function not recognized as a function" );
