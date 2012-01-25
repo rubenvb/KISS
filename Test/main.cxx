@@ -27,12 +27,19 @@
  ********************************************************************************************/
 
 #include <stdio.h>
-#include <types.hxx>
+#include <math.hxx>
+//#include <types.hxx>
     using namespace kiss;
     
-
+/*class A
+{
+public:
+    void const_member_function() const;
+    int member_function();
+};*/
+constexpr bool f() {return true;}
  
 int main()
 {
-
+    static_assert( f(), "ok" );
 }

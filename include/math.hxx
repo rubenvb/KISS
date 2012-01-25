@@ -224,189 +224,222 @@ namespace kiss
         constexpr float atan2(const float x, const float y) { return __builtin_atan2f(x, y); }
         constexpr long double asinh(const long double x, const long double y) { return __builtin_atan2l(x, y); }
         // besselj: bessel function of first kind
-        constexpr double besselj(const double x) { return __builtin_j0(x); }
-        constexpr float besselj(const float x) { return __builtin_j0f(x); }
-        constexpr long double besselj(const long double x) { return __builtin_ceill(x); }
+        //TODO
+        //ceil
+        constexpr double ceil(const double x) { return __builtin_ceil(x); }
+        constexpr float ceil(const float x) { return __builtin_ceilf(x); }
+        constexpr long double ceil(const long double x) { return __builtin_ceill(x); }
+        // cosh
+        constexpr double cosh(const double x) { return __builtin_cosh(x); }
+        constexpr float cosh(const float x) { return __builtin_coshf(x); }
+        constexpr long double cosh(const long double x) { return __builtin_coshl(x); }
+        // cos
+        constexpr double cos(const double x) { return __builtin_cos(x); }
+        constexpr float cos(const float x) { return __builtin_cosf(x); }
+        constexpr long double cos(const long double x) { return __builtin_cosl(x); }
+        // exp
+        constexpr double exp(const double x) { return __builtin_exp(x); }
+        constexpr float exp(const float x) { return __builtin_expf(x); }
+        constexpr long double exp(const long double x) { return __builtin_expl(x); }
+        // exp2
+        constexpr double exp2(const double x) { return __builtin_exp2(x); }
+        constexpr float exp2(const float x) { return __builtin_exp2f(x); }
+        constexpr long double exp2(const long double x) { return __builtin_exp2l(x); }
+        // exp10
+        #ifndef __clang__
+        constexpr double exp10(const double x) { return __builtin_exp10(x); }
+        constexpr float exp10(const float x) { return __builtin_exp10f(x); }
+        constexpr long double exp10(const long double x) { return __builtin_exp10l(x); }
+        #endif
+        // floor
+        constexpr double floor(const double x) { return __builtin_floor(x); }
+        constexpr float floor(const float x) { return __builtin_floorf(x); }
+        constexpr long double floor(const long double x) { return __builtin_floorl(x); }
+        // gamma
+        #ifndef __clang__
+        constexpr double gamma(const double x) { return __builtin_gamma(x); }
+        constexpr float gamma(const float x) { return __builtin_gammaf(x); }
+        constexpr long double gamma(const long double x) { return __builtin_gammal(x); }
+        #endif
+        // mod
+        constexpr double mod(const double x, const double y) { return __builtin_fmod(x, y); }
+        constexpr float mod(const float x, const float y) { return __builtin_fmodf(x, y); }
+        constexpr long double mod(const long double x, const long double y) { return __builtin_fmodl(x, y); }
+        // log
+        constexpr double log(const double x) { return __builtin_log(x); }
+        constexpr float log(const float x) { return __builtin_logf(x); }
+        constexpr long double log(const long double x) { return __builtin_logl(x); }
+        // log10
+        constexpr double log10(const double x) { return __builtin_log10(x); }
+        constexpr float log10(const float x) { return __builtin_log10f(x); }
+        constexpr long double log10(const long double x) { return __builtin_log10l(x); }
+        // pow
+        constexpr double pow(const double x, const double y) { return __builtin_pow(x, y); }
+        constexpr float pow(const float x, const float y) { return __builtin_powf(x, y); }
+        constexpr long double pow(const long double x, const long double y) { return __builtin_powl(x, y); }
+        // pow10
+        #ifndef __clang__
+        constexpr double pow10(const double x) { return __builtin_pow10(x); }
+        constexpr float pow10(const float x) { return __builtin_pow10f(x); }
+        constexpr long double pow10(const long double x) { return __builtin_pow10l(x); }
+        #endif
+        // sin
+        constexpr double sin(const double x) { return __builtin_sin(x); }
+        constexpr float sin(const float x) { return __builtin_sinf(x); }
+        constexpr long double sin(const long double x) { return __builtin_sinl(x); }
+        // sinh
+        constexpr double sinh(const double x) { return __builtin_sinh(x); }
+        constexpr float sinh(const float x) { return __builtin_sinhf(x); }
+        constexpr long double sinh(const long double x) { return __builtin_sinhl(x); }
+        // sqrt
+        constexpr double sqrt(const double x) { return __builtin_sqrt(x); }
+        constexpr float sqrt(const float x) { return __builtin_sqrtf(x); }
+        constexpr long double sqrt(const long double x) { return __builtin_sqrtl(x); }
+        // tan
+        constexpr double tan(const double x) { return __builtin_tan(x); }
+        constexpr float tan(const float x) { return __builtin_tanf(x); }
+        constexpr long double tan(const long double x) { return __builtin_tanl(x); }
+        // tanh
+        constexpr double tanh(const double x) { return __builtin_tanh(x); }
+        constexpr float tanh(const float x) { return __builtin_tanhf(x); }
+        constexpr long double tanh(const long double x) { return __builtin_tanhl(x); }
     }
     // absolute value
-    template<typename T> enable_if<is_unsigned<T>(),T>
-    constexpr abs(const T x) { return x; }
-    template<typename T> enable_if<(is_integral<T>() && is_unsigned<T>() && sizeof(T) < sizeof(int)),T>
-    constexpr abs(const T x) { return static_cast<T>(__implementation::abs(static_cast<int>(x))); }
-    template<typename T> constexpr T abs(const T x) { return __implementation::abs(x); }
+        template<typename T> enable_if<is_unsigned<T>(),T> constexpr
+    abs(const T x) { return x; }
+        template<typename T> enable_if<(is_integral<T>() && is_unsigned<T>() && sizeof(T) < sizeof(int)),T> constexpr
+    abs(const T x) { return static_cast<T>(__implementation::abs(static_cast<int>(x))); }
+        template<typename T> constexpr
+    T abs(const T x) { return __implementation::abs(x); }
     // acos = cos^(-1)
-    template<typename T> enable_if<is_integral<T>(),T> constexpr acos(const T) = delete;    
-    template<typename T> enable_if<is_floating_point<T>(),T>
-    constexpr acos(const T x) { return __implementation::acos(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    acos(const T) = delete;    
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    acos(const T x) { return __implementation::acos(x); }
     // acosh = cosh^(-1)
-    template<typename T> enable_if<is_integral<T>(),T> constexpr acosh(const T) = delete;
-    template<typename T> enable_if<is_floating_point<T>(),T>
-    constexpr acosh(const T x) { return __implementation::acosh(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    acosh(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    acosh(const T x) { return __implementation::acosh(x); }
     // asin = sin^(-1)
-    template<typename T> enable_if<is_integral<T>(),T> constexpr asin(const T) = delete;
-    template<typename T> enable_if<is_floating_point<T>(),T>
-    constexpr asin(const T x) { return __implementation::asin(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    asin(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    asin(const T x) { return __implementation::asin(x); }
     // asinh = sinh^(-1)
-    template<typename T> enable_if<is_integral<T>(),T> constexpr asinh(const T) = delete;
-    template<typename T> enable_if<is_floating_point<T>(),T>
-    constexpr asinh(const T x) { return __implementation::asinh(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    asinh(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    asinh(const T x) { return __implementation::asinh(x); }
     // atan = tan^(-1)
-    template<typename T> enable_if<is_integral<T>(),T> constexpr atan(const T) = delete;
-    template<typename T> enable_if<is_floating_point<T>(),T>
-    constexpr atan(const T x) { return __implementation::atan(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    atan(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    atan(const T x) { return __implementation::atan(x); }
     // atan2 = tan2^(-1)
-    template<typename T> enable_if<is_integral<T>(),T> constexpr atan2(const T, const T) = delete;
-    template<typename T> enable_if<is_floating_point<T>(),T>
-    constexpr atan2(const T x, const T y) { return __implementation::atan2(x,y); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    atan2(const T, const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    atan2(const T x, const T y) { return __implementation::atan2(x,y); }
     // besselj: bessel function of first kind
-    constexpr double besselj(const double x)
-    { return __builtin_j0(x); }
-    constexpr float besselj(const float x)
-    { return __builtin_j0f(x); }
-    constexpr long double besselj(const long double x)
-    { return __builtin_ceill(x); }
+    //TODO
     // ceil: round to +infinity
-    constexpr double ceil(const double x)
-    { return __builtin_ceil(x); }
-    constexpr float ceil(const float x)
-    { return __builtin_ceilf(x); }
-    constexpr long double ceil(const long double x)
-    { return __builtin_ceill(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    ceil(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    ceil(const T x) { return __implementation::ceil(x); }
     // cosh
-    constexpr double cosh(const double x)
-    { return __builtin_cosh(x); }
-    constexpr float cosh(const float x)
-    { return __builtin_coshf(x); }
-    constexpr long double cosh(const long double x)
-    { return __builtin_coshl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    cosh(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    cosh(const T x) { return __implementation::cosh(x); }
     // cos
-    constexpr double cos(const double x)
-    { return __builtin_cos(x); }
-    constexpr float cos(const float x)
-    { return __builtin_cosf(x); }
-    constexpr long double cos(const long double x)
-    { return __builtin_cosl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    cos(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    cos(const T x) { return __implementation::cos(x); }
     // exp
-    constexpr double exp(const double x)
-    { return __builtin_exp(x); }
-    constexpr float exp(const float x)
-    { return __builtin_expf(x); }
-    constexpr long double exp(const long double x)
-    { return __builtin_expl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    exp(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    exp(const T x) { return __implementation::exp(x); }
     // exp2
-    constexpr double exp2(const double x)
-    { return __builtin_exp2(x); }
-    constexpr float exp2(const float x)
-    { return __builtin_exp2f(x); }
-    constexpr long double exp2(const long double x)
-    { return __builtin_exp2l(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    exp2(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    exp2(const T x) { return __implementation::exp2(x); }
     // exp10
     #ifndef __clang__
-    constexpr double exp10(const double x)
-    { return __builtin_exp10(x); }
-    constexpr float exp10(const float x)
-    { return __builtin_exp10f(x); }
-    constexpr long double exp10(const long double x)
-    { return __builtin_exp10l(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    exp10(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    exp10(const T x) { return __implementation::exp10(x); }
     #endif
     // floor: round to -infinity
-    constexpr double floor(const double x)
-    { return __builtin_floor(x); }
-    constexpr float floor(const float x)
-    { return __builtin_floorf(x); }
-    constexpr long double floor(const long double x)
-    { return __builtin_floorl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    floor(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    floor(const T x) { return __implementation::floor(x); }
     // gamma: gamma function
-    constexpr double gamma(const double x)
-    { return __builtin_gamma(x); }
-    constexpr float gamma(const float x)
-    { return __builtin_gammaf(x); }
-    constexpr long double gamma(const long double x)
-    { return __builtin_gammal(x); }
+    #ifndef __clang__
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    gamma(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    gamma(const T x) { return __implementation::gamma(x); }
+    #endif
     // mod = (floating point) remainder of x%y
-    constexpr int mod(const int x, const int y)
-    { return x%y; }
-    constexpr unsigned int mod(const unsigned int x, const unsigned int y)
-    { return x%y; }
-    constexpr long mod(const long x, const long y)
-    { return x%y; }
-    constexpr unsigned long mod(const unsigned long x, const unsigned long y)
-    { return x%y; }
-    constexpr long long mod(const long long x, const long long y)
-    { return x%y; }
-    constexpr unsigned long long mod(const unsigned long long x, const unsigned long long y)
-    { return x%y; }
-    constexpr double mod(const double x, const double y)
-    { return __builtin_fmod(x, y); }
-    constexpr float mod(const float x, const float y)
-    { return __builtin_fmodf(x, y); }
-    constexpr long double mod(const long double x, const long double y)
-    { return __builtin_fmodl(x, y); }
-    // log
-    constexpr double log(const double x)
-    { return __builtin_log(x); }
-    constexpr float log(const float x)
-    { return __builtin_logf(x); }
-    constexpr long double log(const long double x)
-    { return __builtin_logl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    mod(const T x, const T y) { return x%y; }
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    mod(const T x, const T y) { return __implementation::mod(x, y); }
+    // log: 2-argument version calculates log_y(x)
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    log(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    log(const T x) { return __implementation::log(x); }
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    log(const T x, const T y) { return __implementation::log(x)/__implementation::log(y); }
     // log10
-    constexpr double log10(const double x)
-    { return __builtin_log10(x); }
-    constexpr float log10(const float x)
-    { return __builtin_log10f(x); }
-    constexpr long double log10(const long double x)
-    { return __builtin_log10l(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    log10(const T) = delete;
+        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
+    log10(const T x) { return __implementation::log10(x); }
     // pow
-    constexpr double pow(const double x, const double y)
-    { return __builtin_pow(x, y); }
-    constexpr float pow(const float x, const float y)
-    { return __builtin_powf(x, y); }
-    constexpr long double pow(const long double x, const long double y)
-    { return __builtin_powl(x, y); }
+        template<typename T, typename I> enable_if<is_integral<I>(),T> constexpr
+    pow(const T base, const I exponent)
+    { return __builtin_powi(base, static_cast<int>(exponent)); }
+        template<typename T> enable_if<is_floating_point<T>,T> constexpr
+    pow(const T base, const T exponent) { return __implementation::pow(base, exponent); }
     // pow10
     #ifndef __clang__
-    constexpr double pow10(const double x)
-    { return __builtin_pow10(x); }
-    constexpr float pow10(const float x)
-    { return __builtin_pow10f(x); }
-    constexpr long double pow10(const long double x)
-    { return __builtin_pow10l(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    pow10(const T) = delete;
+        template<typename T> constexpr T
+    pow10(const T x) { return __implementation::pow10(x); }
     #endif
     // sin
-    constexpr double sin(const double x)
-    { return __builtin_sin(x); }
-    constexpr float sin(const float x)
-    { return __builtin_sinf(x); }
-    constexpr long double sin(const long double x)
-    { return __builtin_sinl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    sin(const T) = delete;
+        template<typename T> constexpr T
+    sin(const T x) { return __implementation::sin(x); }
     // sinh
-    constexpr double sinh(const double x)
-    { return __builtin_sinh(x); }
-    constexpr float sinh(const float x)
-    { return __builtin_sinhf(x); }
-    constexpr long double sinh(const long double x)
-    { return __builtin_sinhl(x); }
-    // sqrt
-    constexpr double sqrt(const double x)
-    { return __builtin_sqrt(x); }
-    constexpr float sqrt(const float x)
-    { return __builtin_sqrtf(x); }
-    constexpr long double sqrt(const long double x)
-    { return __builtin_sqrtl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    sinh(const T) = delete;
+        template<typename T> constexpr T
+    sinh(const T x) { return __implementation::sinh(x); }
+    // sqrt - ok for integers
+        template<typename T> constexpr T
+    sqrt(const T x) { return __implementation::sqrt(x); }
     // tan
-    constexpr double tan(const double x)
-    { return __builtin_tan(x); }
-    constexpr float tan(const float x)
-    { return __builtin_tanf(x); }
-    constexpr long double tan(const long double x)
-    { return __builtin_tanl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    tan(const T) = delete;
+        template<typename T> constexpr T
+    tan(const T x) { return __implementation::tan(x); }
     // tanh
-    constexpr double tanh(const double x)
-    { return __builtin_tanh(x); }
-    constexpr float tanh(const float x)
-    { return __builtin_tanhf(x); }
-    constexpr long double tanh(const long double x)
-    { return __builtin_tanhl(x); }
+        template<typename T> enable_if<is_integral<T>(),T> constexpr
+    tanh(const T) = delete;
+        template<typename T> constexpr T
+    tanh(const T x) { return __implementation::tanh(x); }
 }
 
 // undefine __builtin_* MSVC workarounds
@@ -474,5 +507,3 @@ namespace kiss
 #endif
 
 #endif
- 
- 

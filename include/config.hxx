@@ -34,11 +34,17 @@
 #ifndef __KISS_CONFIG
 #define __KISS_CONFIG
 
+// has_feature workaround
 #if !defined(__clang__)
 #define __has_feature(X) 0
 #endif
 
-#if defined(_MSC_VER) || (defined(__clang__) && !__has_feature(cxx_constexpr))
+#if defined(__GNUC__)
+#define __is_literal __is_literal_type
+#endif
+
+// constexpr workaround
+#if defined(_MSC_VER) // || (defined(__clang__) && !__has_feature(cxx_constexpr))
 #define constexpr
 #endif
 

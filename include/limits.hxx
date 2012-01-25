@@ -25,30 +25,53 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Ruben Van Boxem.
  ********************************************************************************************/
-
-  /*
-  * utility.hxx
-  *  Utility functions
+ 
+ /*
+  * limits.hxx
+  *  numerical limits for kiss datatypes
   */
 
-#ifndef __KISS_UTILITY
-#define __KISS_UTILITY
+#include "config.hxx"
+#include "types.hxx"
 
 namespace kiss
 {
-        template<typename T> constexpr T&&
-    forward( remove_reference<T> t)
+    template<typename T> struct numeric_limits
     {
-        static_assert(!std::is_lvalue_reference<T>, "lvalue cannot be converted to rvalue.");
-        return static_cast<_Tp&&>(t);
-    }
-    // ffs - index of last bit set
-    int ffs(int i)
-    { return __builtin_ffs(x); }
-    int ffs(long i)
-    { return __builtin_ffsl(x); }
-    int ffs(long long i)
-    { return __builtin_ffsll(x); }
+    public:
+        static constexpr T min = 0;
+        static constexpr T max = 0;
+        static constexpr T lowest = 0;
+        
+        static constexpr digits = 0;
+        static constexpr digits10 = 0;
+        static constexpr max_digits10 = 0;
+        static constexpr bool is_signed = is_signed<T>();
+        static constexpr bool is_integer = is_integal<T>();
+        static constexpr int32 radix = 0;
+        static constexpr T epsilon = 0;
+        static constexpr T round_error = 0;
+        
+        static constexpr int32 min_exponent = 0;
+        static constexpr int32 min_exponent10 = 0;
+        static constexpr int32 max_exponent = 0;
+        static constexpr int32 max_exponent10 = 0;
+        
+        static constexpr has_infinity = false;
+        static constexpr has_quiet_NaN = false;
+        static constexpr has_signaling_NaN = false;
+        // has_denorm
+        // has_denorm_loss
+        static constexpr T infinity = 0;
+        static constexpr T quiet_NaN = 0;
+        static constexpr T signaling_NaN = 0;
+        //static constexpr T denorm_min = 0;
+        
+        // is_iec559
+        // is_bounded
+        // is_modulo
+        
+        // traps
+        // tinyness_before
+        // round_style
 }
-
-#endif

@@ -33,18 +33,28 @@
 
 #include <types.hxx>
 
-class dummy_class
-{
-    void member_function();
-public:
-    static void static_function();
-};
-void f() {return;};
-void ff(...);
-const int g(int);
-const volatile char gg(...);
+#ifndef __clang__
 auto l = [](){};
-auto fp = &f;
+#endif
+class Class {};
+// all sorts of function pointers
+typedef void (function)();
+typedef const volatile int (cvfunction)();
+typedef void (*fp)();
+typedef const volatile void (*cvfp)();
+typedef void (Class::*mfp)();
+/*
+ * Enable when  r-value for *this is widely available
+typedef void (Class::*mfpr)()&;
+typedef void (Class::*mfprr)()&&;
+ */
+typedef void (Class::*cvmfp)() const volatile;
+typedef int Class::*ptm;
+typedef const int Class::* const volatile cvptm;
+#ifndef __clang__
+typedef decltype(l) lambda;
+#endif
+
 
 int main()
 {
@@ -53,7 +63,8 @@ int main()
     static_assert( !kiss::is_void<void*>(),         "void* recognized as void" );
     static_assert( kiss::is_void<const void>(),    "const void not recognized as void" );
     static_assert( kiss::is_void<volatile void>(), "volatile void not recognized as void" );
-    static_assert( !kiss::is_void<dummy_class>(),  "dummy_class recognized as void" );
+    static_assert( !kiss::is_void<char>(),         "char recognized as void" );
+    static_assert( !kiss::is_void<Class>(),  "Class recognized as void" );
     
     // is_nullptr
     static_assert( kiss::is_nullptr<kiss::nullptr_type>(),           "nullptr_type not recognized as nullptr" );
@@ -61,36 +72,76 @@ int main()
     static_assert( !kiss::is_nullptr<kiss::nullptr_type&&>(),        "nullptr_type&& recognized as nullptr" );
     static_assert( !kiss::is_nullptr<const kiss::nullptr_type>(),    "const nullptr_type recognized as nullptr" );
     static_assert( !kiss::is_nullptr<volatile kiss::nullptr_type>(), "volatile nullptr_type recognized as nullptr" );
-    static_assert( !kiss::is_nullptr<dummy_class>(),                 "dummy_class recognized as nullptr" );
-    static_assert( !kiss::is_nullptr<dummy_class*>(),                "dummy_class* recognized as nullptr" );
+    static_assert( !kiss::is_nullptr<Class>(),                 "Class recognized as nullptr" );
+    static_assert( !kiss::is_nullptr<Class*>(),                "Class* recognized as nullptr" );
     
     // is_c_array
-    static_assert( kiss::is_c_array<dummy_class[]>(),         "unknown length array not recognized as C array" );
-    static_assert( kiss::is_c_array<const dummy_class[]>(),   "const unknown length array not recognized as C array" );
-    static_assert( kiss::is_c_array<dummy_class[42]>(),       "fixed-length array not recognized as C array" );
-    static_assert( kiss::is_c_array<const dummy_class[42]>(), "const fixed-length array not recognized as C array" );
-    static_assert( !kiss::is_c_array<dummy_class*>(),         "decayed array aka pointer recognized as C array" );
+    static_assert( kiss::is_c_array<Class[]>(),         "unknown length array not recognized as C array" );
+    static_assert( kiss::is_c_array<const Class[]>(),   "const unknown length array not recognized as C array" );
+    static_assert( kiss::is_c_array<Class[42]>(),       "fixed-length array not recognized as C array" );
+    static_assert( kiss::is_c_array<const Class[42]>(), "const fixed-length array not recognized as C array" );
+    static_assert( !kiss::is_c_array<Class*>(),         "decayed array aka pointer recognized as C array" );
     
     // is_pointer
-    static_assert( !kiss::is_pointer<dummy_class>(),             "dummy_class recognized as pointer" );
-    static_assert( kiss::is_pointer<dummy_class*>(),             "dummy_class* not recognized as pointer" );
-    static_assert( kiss::is_pointer<dummy_class**>(),            "dummy_class** not recognized as pointer" );
-    static_assert( kiss::is_pointer<dummy_class const*>(),       "dummy_class const* not recognized as pointer" );
-    static_assert( kiss::is_pointer<dummy_class * const>(),      "dummy_class *const not recognized as pointer" );
-    static_assert( kiss::is_pointer<dummy_class const* const>(), "dummy_class const* const not recognized as pointer" );
+    static_assert( !kiss::is_pointer<Class>(),             "Class recognized as pointer" );
+    static_assert( kiss::is_pointer<Class*>(),             "Class* not recognized as pointer" );
+    static_assert( kiss::is_pointer<Class**>(),            "Class** not recognized as pointer" );
+    static_assert( kiss::is_pointer<Class const*>(),       "Class const* not recognized as pointer" );
+    static_assert( kiss::is_pointer<Class * const>(),      "Class *const not recognized as pointer" );
+    static_assert( kiss::is_pointer<Class const* const>(), "Class const* const not recognized as pointer" );
     static_assert( !kiss::is_pointer<kiss::nullptr_type>(),      "nullptr_type is recognized as pointer" );
-    static_assert( !kiss::is_pointer<dummy_class&>(),            "dummy_class& recognized as pointer" );
-    static_assert( !kiss::is_pointer<dummy_class&&>(),           "dummy_class&& recognized as pointer" );
-    static_assert( !kiss::is_pointer<dummy_class*&>(),            "dummy_class*& recognized as pointer" );
+    static_assert( !kiss::is_pointer<Class&>(),            "Class& recognized as pointer" );
+    static_assert( !kiss::is_pointer<Class&&>(),           "Class&& recognized as pointer" );
+    static_assert( !kiss::is_pointer<Class*&>(),           "Class*& recognized as pointer" );
+    
+    // is_lvalue_reference
+    static_assert( !kiss::is_lvalue_reference<Class>(),   "Class recognized as lvalue reference" );
+    static_assert( kiss::is_lvalue_reference<Class&>(),   "Class& not recognized as lvalue reference" );
+    static_assert( !kiss::is_lvalue_reference<Class&&>(), "Class&& recognized as lvalue reference" );
+    static_assert( !kiss::is_lvalue_reference<Class*>(),  "Class* recognized as lvalue reference" );
+    static_assert( kiss::is_lvalue_reference<Class*&>(),  "Class*& recognized as lvalue reference" );
+    
+    // is_rvalue_reference
+    static_assert( !kiss::is_rvalue_reference<Class>(),  "Class recognized as rvalue reference" );
+    static_assert( !kiss::is_rvalue_reference<Class&>(), "Class& recognized as rvalue reference" );
+    static_assert( kiss::is_rvalue_reference<Class&&>(), "Class&& not recognized as rvalue reference" );
+    static_assert( !kiss::is_rvalue_reference<Class*>(), "Class* recognized as rvalue reference" );
+    static_assert( !kiss::is_rvalue_reference<Class*&>(), "Class*& recognized as rvalue reference" );
+       
+    // is_reference
+    static_assert( !kiss::is_reference<Class>(),  "Class recognized as reference" );
+    static_assert( kiss::is_reference<Class&>(), "Class& recognized as reference" );
+    static_assert( kiss::is_reference<Class&&>(), "Class&& not recognized as reference" );
+    static_assert( !kiss::is_reference<Class*>(), "Class* recognized as reference" );
+    static_assert( kiss::is_reference<Class*&>(), "Class*& recognized as reference" );
+    
+    // is_member_object_pointer
+    
+    // is_member_function_pointer
+    static_assert( !kiss::is_member_function_pointer<char>(),     "char is recognized as member function pointer" );
+    static_assert( !kiss::is_member_function_pointer<function>(), "function recognized as member function pointer" );
+    #ifndef __clang__
+    static_assert( !kiss::is_member_function_pointer<lambda>(),   "lambda recognized as member function pointer" );
+    #endif
+    static_assert( !kiss::is_member_function_pointer<fp>(),       "fp recognized as member function pointer" );
+    static_assert( kiss::is_member_function_pointer<mfp>(),       "mfp not recognized as member function pointer" );
+    static_assert( kiss::is_member_function_pointer<cvmfp>(),     "cvmfp not recognized as member function pointer" );
+    static_assert( !kiss::is_member_function_pointer<ptm>(),      "ptm is recognized as member function pointer" );
+    static_assert( !kiss::is_member_function_pointer<cvptm>(),    "cvptm is recognized as member function pointer" );
+/* Enable when  r-value for *this is widely available
+    static_assert( kiss::is_member_function_pointer<mfpr>(),      "mfpr not recognized as member function pointer" );
+    static_assert( kiss::is_member_function_pointer<mfprr>(),     "mfprr not recognized as member function pointer" ); 
+ */
     
     // is_function
-    static_assert( !kiss::is_function<char>(),         "char recognized as function" );
-    static_assert( kiss::is_function<
-            decltype(dummy_class::static_function)>(), "static member function recognized as function" );
-    static_assert( !kiss::is_function<decltype(l)>(),  "lambda recognized as function" );
-    static_assert( !kiss::is_function<decltype(fp)>(), "function pointer recognized as function" );
-    static_assert( kiss::is_function<decltype(f)>(),   "void function not recognized as a function" );
-    static_assert( kiss::is_function<decltype(ff)>(),  "void variadic function not recognized as a function" );
-    static_assert( kiss::is_function<decltype(g)>(),   "normal function not recognized as a function" );
-    static_assert( kiss::is_function<decltype(gg)>(),  "const volatile function not recognized as a function" );
+    static_assert( !kiss::is_function<char>(),    "char recognized as function" );
+    static_assert( kiss::is_function<function>(), "function not recognized as function" );
+    #ifndef __clang__
+    static_assert( !kiss::is_function<lambda>(),  "lambda recognized as function" );
+    #endif
+    static_assert( !kiss::is_function<fp>(),      "function pointer recognized as function" );
+    static_assert( !kiss::is_function<mfp>(),     "member function pointer recognized as function" );
+    static_assert( !kiss::is_function<cvmfp>(),    "cvmfp recognized as member function" );
+    static_assert( !kiss::is_function<ptm>(),     "pointer to member recognized as function" );
+    static_assert( !kiss::is_function<cvptm>(),   "cvptm recognized as member function" );
 }
