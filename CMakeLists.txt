@@ -1,13 +1,26 @@
+#
+# KISS - A simple and complete C++ library
+#
+# Written in 2013 by Ruben Van Boxem <vanboxem.ruben@gmail.com>
+#
+# To the extent possible under law, the author(s) have dedicated all copyright and related
+# and neighboring rights to this software to the public domain worldwide. This software is
+# distributed without any warranty.
+#
+# You should have received a copy of the CC0 Public Domain Dedication along with this software.
+# If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
+#
+
 cmake_minimum_required (VERSION 2.8)
 
 project(KISS)
 
 if(MSVC)
-set(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
+#set(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -pedantic ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 -pedantic-errors -Wextra -Wconversion -Wuninitialized -Winit-self -Wmissing-include-dirs -Wstrict-aliasing -Werror ${CMAKE_CXX_FLAGS}")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -pedantic ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 -pedantic-errors -Wextra -Wconversion -Wuninitialized -Winit-self -Wmissing-include-dirs -Wstrict-aliasing -Werror ${CMAKE_CXX_FLAGS}")
 endif()
 
 # Library

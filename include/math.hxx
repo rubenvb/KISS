@@ -1,509 +1,503 @@
 /**
- * Copyright 2012 Ruben Van Boxem. All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- * 
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- * 
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY RUBEN VAN BOXEM ''AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of Ruben Van Boxem.
+ * Written in 2013 by Ruben Van Boxem <vanboxem.ruben@gmail.com>
+ *
+ * To the extent possible under law, the author(s) have dedicated all copyright and related
+ * and neighboring rights to this software to the public domain worldwide. This software is
+ * distributed without any warranty.
+ *
+ * You should have received a copy of the CC0 Public Domain Dedication along with this software.
+ * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
+ *
  ********************************************************************************************/
 
-  /*
-  * math.hxx
-  *  main mathematics function header
-  */
+/*
+* math.hxx
+*  main mathematics function header
+*/
 
 #ifndef __KISS_MATH
 #define __KISS_MATH
 
 #include "config.hxx"
+#include "error.hxx"
 #include "tmp.hxx"
 #include "types.hxx"
 
-// force MSVC intrinsics for math functions
-#ifdef _MSC_VER
-// MSVC needs declarations for #pragma intrinsic
-/*namespace kiss{namespace __implementation{*/extern "C"{
-int abs(int);
-double fabs(double);
-long labs(long);
-__int64 _abs64(__int64);
-double acos(double);
-float acosf(float);
-double asin(double);
-float asinf(float);
-double atan(double);
-float atanf(float);
-double atan2(double,double);
-float atan2f(float,float);
-double ceil(double);
-float ceilf(float);
-double cos(double);
-float cosf(float);
-double cosh(double);
-float coshf(float);
-double exp(double);
-float expf(float);
-double floor(double);
-float floorf(float);
-double fmod(double,double);
-float fmodf(float,float);
-double log(double);
-float logf(float);
-double log10(double);
-float log10f(float);
-double pow(double,double);
-float powf(float,float);
-double sin(double);
-float sinf(float);
-double sinh(double);
-float sinhf(float);
-double sqrt(double);
-float sqrtf(float);
-double tan(double);
-float tanf(float);
-double tanh(double);
-float tanhf(float);
-// these have no intrinsics
-double logl(const long double x) { return log(static_cast<double>(x)); }
-double sqrtl(const long double x) { return sqrt(static_cast<double>(x)); }
-double acosh(const double x) { return log(x+sqrt(x*x-1)); }
-float acoshf(const float x) { return logf(x+sqrtf(x*x-1)); }
-long double acoshl(const long double x) { return logl(x+sqrtl(x*x-1)); }
-double asinh(const double x) { return log(x+sqrt(x*x+1)); }
-float asinhf(const float x) { return logf(x+sqrtf(x*x+1)); }
-long double asinhl(const long double x) { return logl(1+sqrtl(x*x+1)); }
-} // force MSVC to generate intrinsics
-#pragma intrinsic(abs,   fabs,   labs, _abs64, \
-                  acos,  acosf,  /*acosl,*/ \
-                  /*acosh, acoshf, acoshl,*/ \
-                  asin,  asinf,  /*asinl,*/ \
-                  /*asinh, asinhf, asinhl,*/ \
-                  atan,  atanf,  /*atanl,*/ \
-                  atan2, atan2f, /*atan2l,*/ \
-                  /*atanh, atanhf, atanhl, */ \
-                  ceil,  ceilf,  /*ceill,*/ \
-                  cosh,  coshf,  /*coshl,*/ \
-                  cos,   cosf,   /*cosl,*/ \
-                  exp,   expf,   /*expl,*/ \
-                  floor, floorf, /*floorl,*/ \
-                  fmod,  fmodf,  /*fmodl,*/ \
-                  log,   logf,   /*logl,*/ \
-                  log10, log10f, /*log10l,*/ \
-                  pow,   powf,   /*powl,*/ \
-                  sin,   sinf,   /*sinl,*/ \
-                  sinh,  sinhf,  /*sinhl,*/ \
-                  sqrt,  sqrtf,  /*sqrtl,*/ \
-                  tan,   tanf,   /*tanl,*/ \
-                  tanh,  tanhf,  /*tanhl*/ )
-} } // define __builtin_* for MSVC
-#define __builtin_abs         abs
-#define __builtin_fabs        __implementation::fabs
-#define __builtin_fabsf(X)    static_cast<float>(__implementation::fabs(X))
-#define __builtin_fabsl(X)    __implementation::fabs(static_cast<double>(X))
-#define __builtin_labs        __implementation::labs
-#define __builtin_llabs       __implementation::_abs64
-#define __builtin_acos        acos
-#define __builtin_acosf       __implementation::acosf
-#define __builtin_acosl(X)    acos(static_cast<double>(X))
-#define __builtin_acosh       acosh
-#define __builtin_acoshf      __implementation::acoshf
-#define __builtin_acoshl      __implementation::acoshl
-#define __builtin_asin        asin
-#define __builtin_asinf       __implementation::asinf
-#define __builtin_asinl(X)    asin(static_cast<double>(X))
-#define __builtin_asinh       asinh
-#define __builtin_asinhf      __implementation::asinhf
-#define __builtin_asinhl      __implementation::asinhl
-#define __builtin_atan        atan
-#define __builtin_atanf       atanf
-#define __builtin_atanl(X)    atan(static_cast<double>(X))
-#define __builtin_atan2       atan2
-#define __builtin_atan2f      atan2f
-#define __builtin_atan2l(X,Y) atan2(static_cast<double(X), static_cast<double>(Y))
-#define __builtin_ceil        ceil
-#define __builtin_ceilf       ceilf
-#define __builtin_ceill(X)    ceil(static_cast<double>(X))
-#define __builtin_cosh        cosh
-#define __builtin_coshf       coshf
-#define __builtin_coshl(X)    cosh(static_cast<double>(X))
-#define __builtin_cos         cos
-#define __builtin_cosf        cosf
-#define __builtin_cosl(X)     cos(static_cast<double>(X))
-#define __builtin_exp         exp
-#define __builtin_expf        expf
-#define __builtin_expl(X)     exp(static_cast<double>(X))
-#define __builtin_floor       floor
-#define __builtin_floorf      floorf
-#define __builtin_floorl(X)   floor(static_cast<double>(X))
-#define __builtin_fmod        fmod
-#define __builtin_fmodf       fmodf
-#define __builtin_fmodl(X)    fmodl(static_cast<double>(X))
-#define __builtin_log         log
-#define __builtin_logf        logf
-#define __builtin_logl(X)     log(static_cast<double>(X))
-#define __builtin_log10       log10
-#define __builtin_log10f      log10f
-#define __builtin_log10l(X)   log10(static_cast<double>(X))
-#define __builtin_pow         pow
-#define __builtin_powf        powf
-#define __builtin_powl(X)     pow(static_cast<double>(X))
-#define __builtin_sin         sin
-#define __builtin_sinf        sinf
-#define __builtin_sinl(X)     sin(static_cast<double>(X))
-#define __builtin_sinh        sinh
-#define __builtin_sinhf       sinhf
-#define __builtin_sinhl(X)    sinh(static_cast<double>(X))
-#define __builtin_sqrt        sqrt
-#define __builtin_sqrtf       sqrtf
-#define __builtin_sqrtl(X)    sqrt(static_cast<double>(X))
-#define __builtin_tan         tan
-#define __builtin_tanf        tanf
-#define __builtin_tanl(X)     tan(static_cast<double>(X))
-#define __builtin_tanh        tanh
-#define __builtin_tanhf       tanhf
-#define __builtin_tanhl(X)    tanh(static_cast<double>(X))
-#endif
+// define template for all overloads; better than templates usability-wise
+
+
+#define OVERLOAD_FLOAT_MATH_FUNCTION(function) \
+  inline float function(float x) { return C::function##f(x); } \
+  inline double function(double x) { return C::function(x); } \
+  inline long double function(long double x) { return C::function##l(x); }
+#define OVERLOAD_INT_MATH_FUNCTION(function) \
+  inline int function(int x) { return C::function(x); } \
+  inline long int function(long int x) { return C::##ll##function(x); } \
+  inline long long int function(long long int x) { return C::##ll##function(x); }
 
 namespace kiss
 {
 /*
- * Basic math functions:
- *  - everything is a template (to be able to match the correct builtins in the fewest lines of code
- *  - the float-only functions are enable_if'ed to be delete'd and unavailable for integer types to catch common errors
- */
-    namespace __implementation
+ * These are taken directly from the C Standard and prevents necessary inclusion of a C header
+ **/
+  namespace C
+  {
+    extern "C"
     {
-        // absolute value
-        constexpr int abs(const int x) { return __builtin_abs(x); }
-        constexpr long abs(const long x) { return __builtin_labs(x); }
-        constexpr long long abs(const long long x) { return __builtin_llabs(x); }
-        constexpr double abs(const double x) { return __builtin_fabs(x); }
-        constexpr float abs(const float x) { return __builtin_fabsf(x); }
-        constexpr long double abs(const long double x) { return __builtin_fabsl(x); }
-        // acos = cos^(-1)
-        constexpr double acos(const double x) { return __builtin_acos(x); }
-        constexpr float acos(const float x) { return __builtin_acosf(x); }
-        constexpr long double acos(const long double x) { return __builtin_acosl(x); }
-        // acosh = cosh^(-1)
-        constexpr double acosh(const double x) { return __builtin_acosh(x); }
-        constexpr float acoshf(const float x) { return __builtin_acosf(x); }
-        constexpr long double acosh(const long double x) { return __builtin_acoshl(x); }
-        // asin = sin^(-1)
-        constexpr double asin(const double x) { return __builtin_asin(x); }
-        constexpr float asin(const float x) { return __builtin_asinf(x); }
-        constexpr long double asin(const long double x) { return __builtin_asinl(x); }
-        // asinh = sinh^(-1)
-        constexpr double asinh(const double x) { return __builtin_asinh(x); }
-        constexpr float asinh(const float x) { return __builtin_asinhf(x); }
-        constexpr long double asinh(const long double x) { return __builtin_asinhl(x); }
-        // atan = tan^(-1)
-        constexpr double atan(const double x) { return __builtin_atan(x); }
-        constexpr float atan(const float x) { return __builtin_atanf(x); }
-        constexpr long double atan(const long double x) { return __builtin_atanl(x); }
-        // atan2 = tan2^(-1)
-        constexpr double atan2(const double x, const double y) { return __builtin_atan2(x, y); }
-        constexpr float atan2(const float x, const float y) { return __builtin_atan2f(x, y); }
-        constexpr long double asinh(const long double x, const long double y) { return __builtin_atan2l(x, y); }
-        // besselj: bessel function of first kind
-        //TODO
-        //ceil
-        constexpr double ceil(const double x) { return __builtin_ceil(x); }
-        constexpr float ceil(const float x) { return __builtin_ceilf(x); }
-        constexpr long double ceil(const long double x) { return __builtin_ceill(x); }
-        // cosh
-        constexpr double cosh(const double x) { return __builtin_cosh(x); }
-        constexpr float cosh(const float x) { return __builtin_coshf(x); }
-        constexpr long double cosh(const long double x) { return __builtin_coshl(x); }
-        // cos
-        constexpr double cos(const double x) { return __builtin_cos(x); }
-        constexpr float cos(const float x) { return __builtin_cosf(x); }
-        constexpr long double cos(const long double x) { return __builtin_cosl(x); }
-        // exp
-        constexpr double exp(const double x) { return __builtin_exp(x); }
-        constexpr float exp(const float x) { return __builtin_expf(x); }
-        constexpr long double exp(const long double x) { return __builtin_expl(x); }
-        // exp2
-        constexpr double exp2(const double x) { return __builtin_exp2(x); }
-        constexpr float exp2(const float x) { return __builtin_exp2f(x); }
-        constexpr long double exp2(const long double x) { return __builtin_exp2l(x); }
-        // exp10
-        #ifndef __clang__
-        constexpr double exp10(const double x) { return __builtin_exp10(x); }
-        constexpr float exp10(const float x) { return __builtin_exp10f(x); }
-        constexpr long double exp10(const long double x) { return __builtin_exp10l(x); }
-        #endif
-        // floor
-        constexpr double floor(const double x) { return __builtin_floor(x); }
-        constexpr float floor(const float x) { return __builtin_floorf(x); }
-        constexpr long double floor(const long double x) { return __builtin_floorl(x); }
-        // gamma
-        #ifndef __clang__
-        constexpr double gamma(const double x) { return __builtin_gamma(x); }
-        constexpr float gamma(const float x) { return __builtin_gammaf(x); }
-        constexpr long double gamma(const long double x) { return __builtin_gammal(x); }
-        #endif
-        // mod
-        constexpr double mod(const double x, const double y) { return __builtin_fmod(x, y); }
-        constexpr float mod(const float x, const float y) { return __builtin_fmodf(x, y); }
-        constexpr long double mod(const long double x, const long double y) { return __builtin_fmodl(x, y); }
-        // log
-        constexpr double log(const double x) { return __builtin_log(x); }
-        constexpr float log(const float x) { return __builtin_logf(x); }
-        constexpr long double log(const long double x) { return __builtin_logl(x); }
-        // log10
-        constexpr double log10(const double x) { return __builtin_log10(x); }
-        constexpr float log10(const float x) { return __builtin_log10f(x); }
-        constexpr long double log10(const long double x) { return __builtin_log10l(x); }
-        // pow
-        constexpr double pow(const double x, const double y) { return __builtin_pow(x, y); }
-        constexpr float pow(const float x, const float y) { return __builtin_powf(x, y); }
-        constexpr long double pow(const long double x, const long double y) { return __builtin_powl(x, y); }
-        // pow10
-        #ifndef __clang__
-        constexpr double pow10(const double x) { return __builtin_pow10(x); }
-        constexpr float pow10(const float x) { return __builtin_pow10f(x); }
-        constexpr long double pow10(const long double x) { return __builtin_pow10l(x); }
-        #endif
-        // sin
-        constexpr double sin(const double x) { return __builtin_sin(x); }
-        constexpr float sin(const float x) { return __builtin_sinf(x); }
-        constexpr long double sin(const long double x) { return __builtin_sinl(x); }
-        // sinh
-        constexpr double sinh(const double x) { return __builtin_sinh(x); }
-        constexpr float sinh(const float x) { return __builtin_sinhf(x); }
-        constexpr long double sinh(const long double x) { return __builtin_sinhl(x); }
-        // sqrt
-        constexpr double sqrt(const double x) { return __builtin_sqrt(x); }
-        constexpr float sqrt(const float x) { return __builtin_sqrtf(x); }
-        constexpr long double sqrt(const long double x) { return __builtin_sqrtl(x); }
-        // tan
-        constexpr double tan(const double x) { return __builtin_tan(x); }
-        constexpr float tan(const float x) { return __builtin_tanf(x); }
-        constexpr long double tan(const long double x) { return __builtin_tanl(x); }
-        // tanh
-        constexpr double tanh(const double x) { return __builtin_tanh(x); }
-        constexpr float tanh(const float x) { return __builtin_tanhf(x); }
-        constexpr long double tanh(const long double x) { return __builtin_tanhl(x); }
-    }
-    // absolute value
-        template<typename T> enable_if<is_unsigned<T>(),T> constexpr
-    abs(const T x) { return x; }
-        template<typename T> enable_if<(is_integral<T>() && is_unsigned<T>() && sizeof(T) < sizeof(int)),T> constexpr
-    abs(const T x) { return static_cast<T>(__implementation::abs(static_cast<int>(x))); }
-        template<typename T> constexpr
-    T abs(const T x) { return __implementation::abs(x); }
-    // acos = cos^(-1)
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    acos(const T) = delete;    
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    acos(const T x) { return __implementation::acos(x); }
-    // acosh = cosh^(-1)
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    acosh(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    acosh(const T x) { return __implementation::acosh(x); }
-    // asin = sin^(-1)
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    asin(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    asin(const T x) { return __implementation::asin(x); }
-    // asinh = sinh^(-1)
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    asinh(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    asinh(const T x) { return __implementation::asinh(x); }
-    // atan = tan^(-1)
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    atan(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    atan(const T x) { return __implementation::atan(x); }
-    // atan2 = tan2^(-1)
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    atan2(const T, const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    atan2(const T x, const T y) { return __implementation::atan2(x,y); }
-    // besselj: bessel function of first kind
-    //TODO
-    // ceil: round to +infinity
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    ceil(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    ceil(const T x) { return __implementation::ceil(x); }
-    // cosh
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    cosh(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    cosh(const T x) { return __implementation::cosh(x); }
-    // cos
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    cos(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    cos(const T x) { return __implementation::cos(x); }
-    // exp
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    exp(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    exp(const T x) { return __implementation::exp(x); }
-    // exp2
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    exp2(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    exp2(const T x) { return __implementation::exp2(x); }
-    // exp10
-    #ifndef __clang__
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    exp10(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    exp10(const T x) { return __implementation::exp10(x); }
-    #endif
-    // floor: round to -infinity
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    floor(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    floor(const T x) { return __implementation::floor(x); }
-    // gamma: gamma function
-    #ifndef __clang__
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    gamma(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    gamma(const T x) { return __implementation::gamma(x); }
-    #endif
-    // mod = (floating point) remainder of x%y
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    mod(const T x, const T y) { return x%y; }
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    mod(const T x, const T y) { return __implementation::mod(x, y); }
-    // log: 2-argument version calculates log_y(x)
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    log(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    log(const T x) { return __implementation::log(x); }
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    log(const T x, const T y) { return __implementation::log(x)/__implementation::log(y); }
-    // log10
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    log10(const T) = delete;
-        template<typename T> enable_if<is_floating_point<T>(),T> constexpr
-    log10(const T x) { return __implementation::log10(x); }
-    // pow
-        template<typename T, typename I> enable_if<is_integral<I>(),T> constexpr
-    pow(const T base, const I exponent)
-    { return __builtin_powi(base, static_cast<int>(exponent)); }
-        template<typename T> enable_if<is_floating_point<T>,T> constexpr
-    pow(const T base, const T exponent) { return __implementation::pow(base, exponent); }
-    // pow10
-    #ifndef __clang__
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    pow10(const T) = delete;
-        template<typename T> constexpr T
-    pow10(const T x) { return __implementation::pow10(x); }
-    #endif
-    // sin
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    sin(const T) = delete;
-        template<typename T> constexpr T
-    sin(const T x) { return __implementation::sin(x); }
-    // sinh
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    sinh(const T) = delete;
-        template<typename T> constexpr T
-    sinh(const T x) { return __implementation::sinh(x); }
-    // sqrt - ok for integers
-        template<typename T> constexpr T
-    sqrt(const T x) { return __implementation::sqrt(x); }
-    // tan
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    tan(const T) = delete;
-        template<typename T> constexpr T
-    tan(const T x) { return __implementation::tan(x); }
-    // tanh
-        template<typename T> enable_if<is_integral<T>(),T> constexpr
-    tanh(const T) = delete;
-        template<typename T> constexpr T
-    tanh(const T x) { return __implementation::tanh(x); }
-}
+    // Trigonometric
+    double acos(double x);
+    float acosf(float x);
+    long double acosl(long double x);
 
-// undefine __builtin_* MSVC workarounds
-#ifdef _MSC_VER
-#undef __builtin_abs
-#undef __builtin_fabs
-#undef __builtin_fabsf
-#undef __builtin_fabsl
-#undef __builtin_labs
-#undef __builtin_llabs
-#undef __builtin_acos
-#undef __builtin_acosf
-#undef __builtin_acosl
-#undef __builtin_asin
-#undef __builtin_asinf
-#undef __builtin_asinl
-#undef __builtin_atan
-#undef __builtin_atanf
-#undef __builtin_atanl
-#undef __builtin_atan2
-#undef __builtin_atan2f
-#undef __builtin_atan2l
-#undef __builtin_ceil
-#undef __builtin_ceilf
-#undef __builtin_ceill
-#undef __builtin_cosh
-#undef __builtin_coshf
-#undef __builtin_coshl
-#undef __builtin_cos
-#undef __builtin_cosf
-#undef __builtin_cosl
-#undef __builtin_exp
-#undef __builtin_expf
-#undef __builtin_expl
-#undef __builtin_floor
-#undef __builtin_floorf
-#undef __builtin_floorl
-#undef __builtin_fmod
-#undef __builtin_fmodf
-#undef __builtin_fmodl
-#undef __builtin_log
-#undef __builtin_logf
-#undef __builtin_logl
-#undef __builtin_log10
-#undef __builtin_log10f
-#undef __builtin_log10l
-#undef __builtin_pow
-#undef __builtin_powf
-#undef __builtin_powl
-#undef __builtin_sin
-#undef __builtin_sinf
-#undef __builtin_sinl
-#undef __builtin_sinh
-#undef __builtin_sinhf
-#undef __builtin_sinhl
-#undef __builtin_sqrt
-#undef __builtin_sqrtf
-#undef __builtin_sqrtl
-#undef __builtin_tan
-#undef __builtin_tanf
-#undef __builtin_tanl
-#undef __builtin_tanh
-#undef __builtin_tanhf
-#undef __builtin_tanhl
-#endif
+    double asin(double x);
+    float asinf(float x);
+    long double asinl(long double x);
+
+    double asin(double x);
+    float asinf(float x);
+    long double asinl(long double x);
+
+    double atan(double x);
+    float atanf(float x);
+    long double atanl(long double x);
+
+    double atan2(double y, double x);
+    float atan2f(float y, float x);
+    long double atan2l(long double y, long double x);
+
+    double cos(double x);
+    float cosf(float x);
+    long double cosl(long double x);
+
+    double sin(double x);
+    float sinf(float x);
+    long double sinl(long double x);
+
+    double tan(double x);
+    float tanf(float x);
+    long double tanl(long double x);
+
+    // Hyperbolic functions
+    double acosh(double x);
+    float acoshf(float x);
+    long double acoshl(long double x);
+
+    double asinh(double x);
+    float asinhf(float x);
+    long double asinhl(long double x);
+
+    double atanh(double x);
+    float atanhf(float x);
+    long double atanhl(long double x);
+
+    double cosh(double x);
+    float coshf(float x);
+    long double coshl(long double x);
+
+    double sinh(double x);
+    float sinhf(float x);
+    long double sinhl(long double x);
+
+    double tanh(double x);
+    float tanhf(float x);
+    long double tanhl(long double x);
+
+    // Exponential and logarithmic functions
+    double exp(double x);
+    float expf(float x);
+    long double expl(long double x);
+
+    double exp2(double x);
+    float exp2f(float x);
+    long double exp2l(long double x);
+
+    double expm1(double x);
+    float expm1f(float x);
+    long double expm1l(long double x);
+
+    double frexp(double value, int* exp);
+    float frexpf(float value, int* exp);
+    long double frexpl(long double value, int* exp);
+
+    int ilogb(double x);
+    int ilogbf(float x);
+    int ilogbl(long double x);
+
+    double ldexp(double x, int exp);
+    float ldexpf(float x, int exp);
+    long double ldexpl(long double x, int exp);
+
+    double log(double x);
+    float logf(float x);
+    long double logl(long double x);
+
+    double log10(double x);
+    float log10f(float x);
+    long double log10l(long double x);
+
+    double log1p(double x);
+    float log1pf(float x);
+    long double log1pl(long double x);
+
+    double log2(double x);
+    float log2f(float x);
+    long double log2l(long double x);
+
+    double logb(double x);
+    float logbf(float x);
+    long double logbl(long double x);
+
+    double modf(double value, double* iptr);
+    float modff(float value, float* iptr);
+    long double modfl(long double value, long double* iptr);
+
+    double scalbn(double x, int n);
+    float scalbnf(float x, int n);
+    long double scalbnl(long double x, int n);
+
+    // Power and absolute-value functions
+    double cbrt(double x);
+    float cbrtf(float x);
+    long double cbrtl(long double x);
+
+    double fabs(double x);
+    float fabsf(float x);
+    long double fabsl(long double x);
+
+    double pow(double x, double y);
+    float powf(float x, float y);
+    long double powl(long double x, long double y);
+
+    double sqrt(double x);
+    float sqrtf(float x);
+    long double sqrtl(long double x);
+
+    // Error and gamma functions
+    double erf(double x);
+    float erff(float x);
+    long double erfl(long double x);
+
+    double erfc(double x);
+    float erfcf(float x);
+    long double erfcl(long double x);
+
+    double lgamma(double x);
+    float lgammaf(float x);
+    long double lgammal(long double x);
+
+    double tgamma(double x);
+    float tgammaf(float x);
+    long double tgammal(long double x);
+
+    // Nearest integer functions
+    double ceil(double x);
+    float ceilf(float x);
+    long double ceill(long double x);
+
+    double floor(double x);
+    float floorf(float x);
+    long double floorl(long double x);
+
+    double nearbyint(double x);
+    float nearbyintf(float x);
+    long double nearbyintl(long double x);
+
+    double rint(double x);
+    float rintf(float x);
+    long double rintl(long double x);
+
+    long int lrint(double x);
+    long int lrintf(float x);
+    long int lrintl(long double x);
+    long long int llrint(double x);
+    long long int llrintf(float x);
+    long long int llrintl(long double x);
+
+    double round(double x);
+    float roundf(float x);
+    long double roundl(long double x);
+
+    long int lround(double x);
+    long int lroundf(float x);
+    long int lroundl(long double x);
+    long long int llround(double x);
+    long long int llroundf(float x);
+    long long int llroundl(long double x);
+
+    double trunc(double x);
+    float truncf(float x);
+    long double truncl(long double x);
+
+    double fmod(double x, double y);
+    float fmodf(float x, float y);
+    long double fmodl(long double x, long double y);
+
+    double remainder(double x, double y);
+    float remainderf(float x, float y);
+    long double remainderl(long double x, long double y);
+
+    // The remquo functions
+    double remquo(double x, double y, int* quo);
+    float remquof(float x, float y, int* quo);
+    long double remquol(long double x, long double y, int* quo);
+
+    // Manipulation functions
+    double copysign(double x, double y);
+    float copysignf(float x, float y);
+    long double copysignl(long double x, long double y);
+
+    double nan(const char* tagp);
+    float nanf(const char* tagp);
+    long double nanl(const char* tagp);
+
+    double nextafter(double x, double y);
+    float nextafterf(float x, float y);
+    long double nextafterl(long double x, long double y);
+
+    double nexttoward(double x, long double y);
+    float nexttowardf(float x, long double y);
+    long double nexttowardl(long double x, long double y);
+
+    // Maximum, minimum, and positive difference functions
+    double fdim(double x, double y);
+    float fdimf(float x, float y);
+    long double fdiml(long double x, long double y);
+
+    double fmax(double x, double y);
+    float fmaxf(float x, float y);
+    long double fmaxl(long double x, long double y);
+
+    double fmin(double x, double y);
+    float fminf(float x, float y);
+    long double fminl(long double x, long double y);
+
+    // Floating multiply-add
+    double fma(double x, double y, double z);
+    float fmaf(float x, float y, float z);
+    long double fmal(long double x, long double y, long double z);
+    }
+  }
+/*
+ * Trigonometric functions
+ */
+  inline float acos(float x) { return C::acosf(x); } \
+  inline double acos(double x) { return C::acos(x); } \
+  inline long double acos(long double x) { return C::acosl(x); }
+
+  inline float asin(float x) { return C::asinf(x); } \
+  inline double asin(double x) { return C::asin(x); } \
+  inline long double asin(long double x) { return C::asinl(x); }
+
+  inline float atan(float x) { return C::atanf(x); } \
+  inline double atan(double x) { return C::atan(x); } \
+  inline long double atan(long double x) { return C::atanl(x); }
+
+  inline float atan2(float x, float y) { return C::atan2f(x, y); } \
+  inline double atan2(double x, double y) { return C::atan2(x, y); } \
+  inline long double atan2(long double x, long double y) { return C::atan2l(x, y); }
+
+  inline float cos(float x) { return C::cosf(x); } \
+  inline double cos(double x) { return C::cos(x); } \
+  inline long double cos(long double x) { return C::cosl(x); }
+
+  inline float sin(float x) { return C::sinf(x); } \
+  inline double sin(double x) { return C::sin(x); } \
+  inline long double sin(long double x) { return C::sinl(x); }
+
+  inline float tan(float x) { return C::tanf(x); } \
+  inline double tan(double x) { return C::tan(x); } \
+  inline long double tan(long double x) { return C::tanl(x); }
+
+  inline float acosh(float x) { return C::acoshf(x); } \
+  inline double acosh(double x) { return C::acosh(x); } \
+  inline long double acosh(long double x) { return C::acoshl(x); }
+
+  inline float asinh(float x) { return C::asinhf(x); } \
+  inline double asinh(double x) { return C::asinh(x); } \
+  inline long double asinh(long double x) { return C::asinhl(x); }
+
+  inline float atanh(float x) { return C::atanhf(x); } \
+  inline double atanh(double x) { return C::atanh(x); } \
+  inline long double atanh(long double x) { return C::atanhl(x); }
+
+  inline float sinh(float x) { return C::sinhf(x); } \
+  inline double sinh(double x) { return C::sinh(x); } \
+  inline long double sinh(long double x) { return C::sinhl(x); }
+
+  inline float tanh(float x) { return C::tanhf(x); } \
+  inline double tanh(double x) { return C::tanh(x); } \
+  inline long double tanh(long double x) { return C::tanhl(x); }
+
+  inline float exp(float x) { return C::expf(x); }
+  inline double exp(double x) { return C::exp(x); }
+  inline long double exp(long double x) { return C::expl(x); }
+
+  inline float exp2(float x) { return C::exp2f(x); }
+  inline double exp2(double x) { return C::exp2(x); }
+  inline long double exp2(long double x) { return C::exp2l(x); }
+
+  inline float expm1(float x) { return C::expm1f(x); }
+  inline double exp1m(double x) { return C::expm1(x); }
+  inline long double exp1m(long double x) { return C::expm1l(x); }
+
+  inline float frexp(float x, int* exp) { return C::frexpf(x, exp); }
+  inline double frexp(double x, int* exp) { return C::frexp(x, exp); }
+  inline long double frexp(long double x, int* exp) { return C::frexpl(x, exp); }
+
+  inline int ilogb(float x) { return C::ilogbf(x); }
+  inline int ilogb(double x) { return C::ilogb(x); }
+  inline int ilogb(long double x) { return C::ilogbl(x); }
+
+  inline float ldexp(float x, int exp) { return C::ldexpf(x, exp); }
+  inline double ldexp(double x, int exp) { return C::ldexp(x, exp); }
+  inline long double ldexp(long double x, int exp) { return C::ldexpl(x, exp); }
+
+  inline float log(float x) { return C::logf(x); }
+  inline double log(double x) { return C::log(x); }
+  inline long double log(long double x) { return C::logl(x); }
+
+  inline float log10(float x) { return C::log10f(x); }
+  inline double log10(double x) { return C::log10(x); }
+  inline long double log10(long double x) { return C::log10l(x); }
+
+  inline float log1p(float x) { return C::log1pf(x); }
+  inline double log1p(double x) { return C::log1p(x); }
+  inline long double log1p(long double x) { return C::log1pl(x); }
+
+  inline float log2(float x) { return C::log2f(x); }
+  inline double log2(double x) { return C::log2(x); }
+  inline long double log2(long double x) { return C::log2l(x); }
+
+  inline float logb(float x) { return C::logbf(x); }
+  inline double logb(double x) { return C::logb(x); }
+  inline long double logb(long double x) { return C::logbl(x); }
+
+  inline float modf(float x, float* iptr) { return C::modff(x, iptr); }
+  inline double modf(double x, double* iptr) { return C::modf(x, iptr); }
+  inline long double modf(long double x, long double* iptr) { return C::modfl(x, iptr); }
+
+  inline float scalbn(float x, int n) { return C::scalbnf(x, n); }
+  inline double scalbn(double x, int n) { return C::scalbn(x, n); }
+  inline long double scalbn(long double x, int n) { return C::scalbnl(x, n); }
+
+  inline float cbrt(float x) { return C::cbrtf(x); }
+  inline double cbrt(double x) { return C::cbrt(x); }
+  inline long double cbrt(long double x) { return C::cbrtl(x); }
+
+  // fabs-> abs
+  inline float abs(float x) { return C::fabsf(x); }
+  inline double abs(double x) { return C::fabs(x); }
+  inline long double abs(long double x) { return C::fabsl(x); }
+
+  inline float pow(float x, float y) { return C::powf(x, y); }
+  inline double pow(double x, double y) { return C::pow(x, y); }
+  inline long double pow(long double x, long double y) { return C::powl(x, y); }
+
+  inline float sqrt(float x) { return C::sqrtf(x); }
+  inline double sqrt(double x) { return C::sqrt(x); }
+  inline long double sqrt(long double x) { return C::sqrtl(x); }
+
+  inline float erf(float x) { return C::erff(x); }
+  inline double erf(double x) { return C::erf(x); }
+  inline long double erf(long double x) { return C::erfl(x); }
+
+  inline float erfc(float x) { return C::erfcf(x); }
+  inline double erfc(double x) { return C::erfc(x); }
+  inline long double erfc(long double x) { return C::erfcl(x); }
+
+  inline float lgamma(float x) { return C::lgammaf(x); }
+  inline double lgamma(double x) { return C::lgamma(x); }
+  inline long double lgamma(long double x) { return C::lgammal(x); }
+
+  inline float tgamma(float x) { return C::tgammaf(x); }
+  inline double tgamma(double x) { return C::tgamma(x); }
+  inline long double tgamma(long double x) { return C::tgammal(x); }
+
+  inline float ceil(float x) { return C::ceilf(x); }
+  inline double ceil(double x) { return C::ceil(x); }
+  inline long double ceil(long double x) { return C::ceill(x); }
+
+  inline float floor(float x) { return C::floorf(x); }
+  inline double floor(double x) { return C::floor(x); }
+  inline long double floor(long double x) { return C::floorl(x); }
+
+  inline float nearbyint(float x) { return C::nearbyintf(x); }
+  inline double nearbyint(double x) { return C::nearbyint(x); }
+  inline long double nearbyint(long double x) { return C::nearbyintl(x); }
+
+  inline float rint(float x) { return C::rintf(x); }
+  inline double rint(double x) { return C::rint(x); }
+  inline long double rint(long double x) { return C::rintl(x); }
+
+  inline long int lrint(float x) { return C::lrintf(x); }
+  inline long int lrint(double x) { return C::lrint(x); }
+  inline long int lrint(long double x) { return C::lrintl(x); }
+  inline long long int llrint(float x) { return C::llrintf(x); }
+  inline long long int llrint(double x) { return C::llrint(x); }
+  inline long long int llrint(long double x) { return C::llrintl(x); }
+
+  inline float round(float x) { return C::roundf(x); }
+  inline double round(double x) { return C::round(x); }
+  inline long double round(long double x) { return C::roundl(x); }
+
+  inline long int lround(float x) { return C::lroundf(x); }
+  inline long int lround(double x) { return C::lround(x); }
+  inline long int lround(long double x) { return C::lroundl(x); }
+  inline long long int llround(float x) { return C::llroundf(x); }
+  inline long long int llround(double x) { return C::llround(x); }
+  inline long long int llround(long double x) { return C::llroundl(x); }
+
+  inline float trunc(float x) { return C::truncf(x); }
+  inline double trunc(double x) { return C::trunc(x); }
+  inline long double trunc(long double x) { return C::truncl(x); }
+
+  // fmod->mod
+  inline float mod(float x, float y) { return C::fmodf(x, y); }
+  inline double mod(double x, double y) { return C::fmod(x, y); }
+  inline long double mod(long double x, long double y) { return C::fmodl(x, y); }
+
+  inline float remainder(float x, float y) { return C::remainderf(x, y); }
+  inline double remainder(double x, double y) { return C::remainder(x, y); }
+  inline long double remainder(long double x, long double y) { return C::remainderl(x, y); }
+
+  inline float remquo(float x, float y, int* quo) { return C::remquof(x, y, quo); }
+  inline double remquo(double x, double y, int* quo) { return C::remquo(x, y, quo); }
+  inline long double remquo(long double x, long double y, int* quo) { return C::remquol(x, y, quo); }
+
+  inline float copysign(float x, float y) { return C::copysignf(x, y); }
+  inline double copysign(double x, double y) { return C::copysign(x, y); }
+  inline long double copysign(long double x, long double y) { return C::copysignl(x, y); }
+
+//TODO
+  //inline float nan( x) { return C::nanf(x); }
+  //inline double nan (double x) { return C::nan(x); }
+  //inline long double nan(long double x) { return C::nanl(x); }
+
+  inline float nextafter(float x, float y) { return C::nextafterf(x, y); }
+  inline double nextafter(double x, double y) { return C::nextafter(x, y); }
+  inline long double nextafter(long double x, long double y) { return C::nextafterl(x, y); }
+
+  inline float nexttoward(float x, float y) { return C::nexttowardf(x, y); }
+  inline double nexttoward(double x, double y) { return C::nexttoward(x, y); }
+  inline long double nexttoward(long double x, long double y) { return C::nexttowardl(x, y); }
+
+  inline float fdim(float x, float y) { return C::fdimf(x, y); }
+  inline double fdim(double x, double y) { return C::fdim(x, y); }
+  inline long double fdim(long double x, long double y) { return C::fdiml(x, y); }
+
+  // fmax->max
+  inline float max(float x, float y) { return C::fmaxf(x, y); }
+  inline double max(double x, double y) { return C::fmax(x, y); }
+  inline long double max(long double x, long double y) { return C::fmaxl(x, y); }
+
+  // fmin->min
+  inline float min(float x, float y) { return C::fminf(x, y); }
+  inline double min(double x, double y) { return C::fmin(x, y); }
+  inline long double min(long double x, long double y) { return C::fminl(x, y); }
+
+  inline float fma(float x, float y, float z) { return C::fmaf(x, y, z); }
+  inline double fma(double x, double y, double z) { return C::fma(x, y, z); }
+  inline long double fma(long double x, long double y, long double z) { return C::fmal(x, y, z); }
+}
 
 #endif
