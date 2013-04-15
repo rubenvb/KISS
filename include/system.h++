@@ -10,10 +10,15 @@
  *
  ********************************************************************************************/
 
- /*
-  * system.hxx
-  *  system information like
-  *   - cpu capabilities (cpuid)
-  *   - username? userid? memory?
-  *   - ...
-  */
+/*
+ * system.h++
+ *  system information like
+ *   - cpu capabilities (cpuid)
+ *   - username? userid? memory?
+ *   - ...
+ **/
+
+#ifndef KISS_SYSTEM
+#define KISS_SySTEM
+
+#endif

@@ -10,9 +10,10 @@
  *
  ********************************************************************************************/
 
- /*
-  * owning_ptr: smart pointer that holds exclusive ownership of its data
-  **/
+/*
+ * owning_ptr.h++
+ *  Smart pointer that holds exclusive ownership of its data.
+ **/
 
 #ifndef KISS_oWNING_PTR
 #define KISS_oWNING_PTR

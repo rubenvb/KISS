@@ -15,8 +15,11 @@
  *  Numerical limits.
  **/
 
-#include "config.hxx"
-#include "types.hxx"
+#ifndef KISS_LIMITS
+#define KISS_LIMITS
+
+#include "config.h++"
+#include "types.h++"
 
 namespace kiss
 {
@@ -61,3 +64,5 @@ namespace kiss
 }
 
 //TODO
+
+#endif

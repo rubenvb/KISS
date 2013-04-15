@@ -19,9 +19,9 @@
 #define KISS_MATH
 
 #include "config.h++"
-#include "error.hxx"
-#include "tmp.hxx"
-#include "types.hxx"
+#include "error.h++"
+#include "tmp.h++"
+#include "types.h++"
 
 // define template for all overloads; better than templates usability-wise
 

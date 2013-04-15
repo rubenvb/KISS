@@ -11,10 +11,10 @@
  ********************************************************************************************/
 
 #include <stdio.h>
-#include <math.hxx>
-#include <tmp.hxx>
-#include <types.hxx>
-#include <utility.hxx>
+#include <math.h++>
+#include <tmp.h++>
+#include <types.h++>
+#include <utility.h++>
   using namespace kiss;
 
 #include <typeinfo>

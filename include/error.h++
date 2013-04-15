@@ -16,6 +16,9 @@
  *  KISS error exceptions.
  **/
 
+#ifndef KISS_ERROR
+#define KISS_ERROR
+
 namespace kiss {
   class error;
 
@@ -32,3 +35,5 @@ namespace kiss {
       virtual void print_message() { throw unimplemented(); }
   };
 }
+
+#endif

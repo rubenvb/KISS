@@ -10,15 +10,15 @@
  *
  ********************************************************************************************/
 
- /*
-  * tmp.hxx
-  *  Template meta programming constructs
-  */
+/*
+ * tmp.h++
+ *  Template meta programming constructs.
+ **/
 
 #ifndef KISS_TMP
 #define KISS_TMP
 
-#include "config.hxx"
+#include "config.h++"
 
 namespace kiss
 {

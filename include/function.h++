@@ -15,8 +15,11 @@
  *  Equivalent to C++'s std::function.
  **/
 
-#include "config.hxx"
-#include "utility.hxx"
+#ifndef KISS_FUNCTION
+#define KISS_FUNCTION
+
+#include "config.h++"
+#include "utility.h++"
 
 /*
  *from Lounge<C++>
@@ -58,3 +61,5 @@ namespace kiss
     ret operator()(param_types... ps) {return (*ptr)();}
   };
 }
+
+#endif

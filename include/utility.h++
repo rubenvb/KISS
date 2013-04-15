@@ -10,15 +10,15 @@
  *
  ********************************************************************************************/
 
-  /*
-  * utility.hxx
-  *  Utility functions
-  */
+/*
+ * utility.h++
+ *  Utility functions.
+ **/
 
 #ifndef KISS_UTILITY
 #define KISS_UTILITY
 
-#include "types.hxx"
+#include "types.h++"
 
 namespace kiss
 {

@@ -15,6 +15,9 @@
  *  Fixed and variable sized managed memory with contiguous storage
  **/
 
+#ifndef KISS_ARRAY
+#define KISS_ARRAY
+
 namespace kiss
 {
   // Fixed-size
@@ -35,3 +38,5 @@ namespace kiss
   };
 
 }
+
+#endif
