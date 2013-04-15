@@ -224,6 +224,13 @@ namespace kiss
     template<typename T> struct is_c_array : public false_type {};
     template<typename T> struct is_c_array<T[]> : public true_type {};
     template<typename T, size_type N> struct is_c_array<T[N]> : public true_type {};
+    // is_member_function_pointer
+    template<typename T> struct is_member_function_pointer : false_type {};
+    template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...)> : true_type {};
+    template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) const> : true_type {};
+    template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) volatile> : true_type {};
+    template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) const volatile> : true_type {};
+
   }
   // is_c_array
   template<typename T> struct is_c_array : false_type {};
@@ -244,11 +251,7 @@ namespace kiss
   template<typename T> struct is_lvalue_reference : false_type {};
   template<typename T> struct is_lvalue_reference<T&> : true_type {};
   // is_member_function_pointer
-  template<typename T> struct is_member_function_pointer : false_type {};
-  template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...)> : true_type {};
-  template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) const> : true_type {};
-  template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) volatile> : true_type {};
-  template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) const volatile> : true_type {};
+  template<typename T> struct is_member_function_pointer : implementation::is_member_function_pointer<typename remove_reference<T>::type> {};
   // is_member_object_pointer
   template<typename T> struct is_member_object_pointer : false_type {};
   // is_nullptr
