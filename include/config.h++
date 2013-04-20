@@ -18,6 +18,13 @@
 #ifndef KISS_CONFIG
 #define KISS_CONFIG
 
+#if defined(_MSC_VER) && !defined(__clang__) && !defined(__ICL)
+#error "this shit is broken anyway"
+#define constexpr const
+typedef wchar_t       char16_t;
+typedef unsigned long char32_t;
+#endif
+
 namespace kiss
 {
   constexpr int major_version = 0;

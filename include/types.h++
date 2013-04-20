@@ -51,10 +51,10 @@ namespace kiss
 /*
  * integral_constant
  **/
-  template<typename T, T valueT>
+  template<typename T, T value>
   struct integral_constant
   {
-    static constexpr T value = valueT;
+    //static constexpr T value = valueT;
     typedef integral_constant<T,value> type;
     constexpr operator T() { return value; }
   };
@@ -127,8 +127,9 @@ namespace kiss
  * Boolean traits
  **/
   // Intrinsic implementations - need to be converted to pure, but simple SFINAE
+  template<typename T> struct has_virtual_destructor : integral_constant<bool, __has_virtual_destructor(T)> {};
   // is_base_of
-  template<typename Base, typename Class> struct is_base_of : integral_constant<bool, __is_base_of(Base, Class)> {};
+  //template<typename Base, typename Class> struct is_base_of : integral_constant<bool, __is_base_of(Base, Class)> {};
   // is_class
   template<typename T> struct is_class : integral_constant<bool, __is_class(typename remove_cv<T>::type)> {};
   // is_convertible
@@ -137,6 +138,22 @@ namespace kiss
   template<typename T> struct is_enum : integral_constant<bool, __is_enum(typename remove_cv<T>::type)> {};
   // is_union
   template<typename T> struct is_union : integral_constant<bool, __is_union(typename remove_cv<T>::type)> {};
+  // is_literal
+  template<typename T> struct is_literal_type : integral_constant<bool, __is_literal(T)> {};
+  // is_empty
+  template<typename T> struct is_empty : integral_constant<bool, __is_empty(T)> {};
+  // is_polymorphic
+  template<typename T> struct is_polymorphic : integral_constant<bool, __is_polymorphic(T)> {};
+  // is_abstract
+  template<typename T> struct is_abstract : integral_constant<bool, __is_abstract(T)> {};
+  // is_pod
+  template<typename T> struct is_pod : integral_constant<bool, __is_pod(T)> {};
+  // is_trivial
+  template<typename T> struct is_trivial : integral_constant<bool, __is_trivial(T)> {};
+  // is_trivially_copyable
+  template<typename T> struct is_trivially_copyable : integral_constant<bool, __has_trivial_copy(T)> {};
+  // is_standard_layout
+  template<typename T> struct is_standard_layout : integral_constant<bool, __is_standard_layout(T)> {};
 
   // Traits needed below
   // is_const
@@ -151,7 +168,7 @@ namespace kiss
     template<class>
     static auto test(...) -> false_type;
 
-    static constexpr bool value = decltype(test<From>(0))::value;
+    static constexpr bool value = decltype(test<From>(0))();
     constexpr operator bool() { return value; }
   };
   // is_lvalue_reference
@@ -172,9 +189,19 @@ namespace kiss
 
   namespace implementation
   {
-    // is_void
-    template<typename> struct is_void : false_type {};
-    template<> struct is_void<void> : true_type {};
+    // is_c_array
+    template<typename> struct is_c_array : public false_type {};
+    template<typename T> struct is_c_array<T[]> : public true_type {};
+    template<typename T, size_type N> struct is_c_array<T[N]> : public true_type {};
+    // is_floating_point
+    template<typename> struct is_floating_point : false_type {};
+    template<> struct is_floating_point<float> : true_type {};
+    template<> struct is_floating_point<double> : true_type {};
+    template<> struct is_floating_point<long double> : true_type {};
+    // is_function
+    template<typename T> struct is_function : integral_constant<bool, !is_convertible<T*, const volatile void*>()> {};
+    template<typename T> struct is_function<T&> : false_type {};
+    template<typename T> struct is_function<T&&> : false_type {};
     // is_integral
     template<typename> struct is_integral : false_type{};
     template<> struct is_integral<bool>               : true_type {};
@@ -192,42 +219,47 @@ namespace kiss
     template<> struct is_integral<unsigned long>      : true_type {};
     template<> struct is_integral<long long>          : true_type {};
     template<> struct is_integral<unsigned long long> : true_type {};
-    // is_floating_point
-    template<typename> struct is_floating_point : false_type {};
-    template<> struct is_floating_point<float> : true_type {};
-    template<> struct is_floating_point<double> : true_type {};
-    template<> struct is_floating_point<long double> : true_type {};
-    // is_pointer
-    template<typename> struct is_pointer : false_type {};
-    template<typename T> struct is_pointer<T*> : true_type {};
-    // is_unbound_c_array for default_constructible traits
-    template<typename> struct is_unbound_c_array : public false_type {};
-    template<typename T> struct is_unbound_c_array<T[]> : public true_type {};
-    // is_c_array
-    template<typename> struct is_c_array : public false_type {};
-    template<typename T> struct is_c_array<T[]> : public true_type {};
-    template<typename T, size_type N> struct is_c_array<T[N]> : public true_type {};
-    // is_function
-    template<typename T> struct is_function : integral_constant<bool, !is_convertible<T*, const volatile void*>()> {};
-    template<typename T> struct is_function<T&> : false_type {};
-    template<typename T> struct is_function<T&&> : false_type {};
-    // own implementation
-    //template<typename> struct is_function : false_type {};
-    // template<typename T, typename... Args> struct is_function<T(Args...)> : true_type {}; // normal function
-    // template<typename T, typename... Args> struct is_function<T(Args...,...)> : true_type {}; // variadic function
-
     // is_member_function_pointer
     template<typename> struct is_member_function_pointer : false_type {};
     template <typename T, typename Class> struct is_member_function_pointer<T Class::*> : is_function<T> {};
-
-    // own implementation - missing r-value ref for this variants?
-    //template<typename T> struct is_member_function_pointer : false_type {};
-    //template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...)> : true_type {};
-    //template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) const> : true_type {};
-    //template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) volatile> : true_type {};
-    //template<typename T, typename Class, typename... Args> struct is_member_function_pointer<T (Class::*)(Args...) const volatile> : true_type {};
-
+    // is_pointer
+    template<typename> struct is_pointer : false_type {};
+    template<typename T> struct is_pointer<T*> : true_type {};
+    // is_void
+    template<typename> struct is_void : false_type {};
+    template<> struct is_void<void> : true_type {};
   }
+  // is_constructible
+  template<typename T> struct is_constructible : integral_constant<bool, declval<T>()
+  // is_copy_constructible
+  template <typename T> struct is_copy_constructible : is_constructible<T, const typename add_lvalue_reference<T>::type> {};
+  // is_default_constructible
+  template <class T> struct is_default_constructible : is_constructible<T> {};
+
+  // is_move_constructible
+  template <typename T> struct is_copy_constructible : is_constructible<T, const typename add_rvalue_reference<T>::type> {};
+  // is_assignable
+  //TODO
+  // is_copy_assignable
+  //TODO
+  // is_move_assignable
+  //TODO
+  // is_destructible
+  //TODO
+  // is_base_of
+  //TODO: this fails when there is a conversion operator and
+  //template<typename Base, typename Class> struct is_base_of
+  //{
+  //  static void foo(Base*);
+  //  template<class F>
+  //  static auto test(int) -> decltype(foo(declval<F*>()), true_type{});
+  //  template<class>
+  //  static auto test(...) -> false_type;
+  //
+  //  static constexpr bool value = decltype(test<Class>(0))();
+  //  constexpr operator bool() { return value; }
+  //};
+
   // is_c_array
   template<typename T> struct is_c_array : implementation::is_c_array<typename remove_cv<T>::type> {};
   // is_floating_point
@@ -236,27 +268,31 @@ namespace kiss
   template<typename T> struct is_function : implementation::is_function<typename remove_cv<T>::type> {};
   // is_integral
   template<typename T> struct is_integral : implementation::is_integral<typename remove_cv<T>::type> {};
-
+  //is_arithmetic
+  template<typename T> struct is_arithmetic : integral_constant<bool, is_floating_point<T>() || is_integral<T>()> {};
+  // is_fundamental
+  //TODO
+  // is_compund
+  //template<typename T> struct is_compound : integral_constant<bool, !is_fundamental<T>()> {};
   // is_member_function_pointer
-  //template<typename T> struct is_member_function_pointer : implementation::is_member_function_pointer<T const volatile> {};
+  //TODO
   template<typename T> struct is_member_function_pointer : implementation::is_member_function_pointer<typename remove_reference<T>::type> {};
   // is_member_pointer
-
+  //TODO
   // is_member_object_pointer
   //template<typename T> struct is_member_object_pointer : integral_constant<bool, is_member_pointer<T>() && !is_member_function_pointer<T>()> {};
-
   // is_pointer
   template<typename T> struct is_pointer : implementation::is_pointer<typename remove_cv<T>::type> {};
-
   // is_reference
   template<typename T> struct is_reference : integral_constant<bool, is_lvalue_reference<T>() || is_rvalue_reference<T>()> {};
+  // is_scalar
+  //template<typename T> struct is_scalar : integral_constant<bool, is_pointer<T>() || is_arithmetic<T>() || is_enum<T>() || is_member_pointer<T>()> {};
+  // is_object
+  //template<typename T> struct is_object : integral_constant<bool, is_scalar<T>() || is_c_array<T>() || is_union<T>() || is_class<T>()> {};
   // is_signed
   template<typename T> struct is_signed : integral_constant<bool, T(-1) < T(0)> {};
-  // is_unbound_c_array
-  template<typename T> struct is_unbound_c_array : implementation::is_unbound_c_array<typename remove_cv<T>::type> {};
   // is_void
   template<typename T> struct is_void : implementation::is_void<typename remove_cv<T>::type> {};
-
 
 /*
  * Value traits
@@ -279,89 +315,39 @@ namespace kiss
   template<typename T, typename X> struct is_nothrow_move_assignable : is_nothrow_assignable<add_lvalue_reference<T>, add_rvalue_reference<X>> {};
   template<typename T> struct is_nothrow_destructible : integral_constant<bool, noexcept(declval<T>().~T())> {};
 
-  /*
- * Secondary classification
- */
- /* template<typename T> constexpr bool
-  is_reference() { return is_rvalue_reference<T>() || is_lvalue_reference<T>(); }
-  template<typename T> constexpr bool
-  is_arithmetic() { return is_integral<T>() || is_floating_point<T>(); }
-  template<typename T> constexpr bool
-  is_fundamental() { return is_void<T>() || is_arithmetic<T>(); }
-  template<typename T> constexpr bool
-  is_member_pointer() { return is_member_object_pointer<T>() || is_member_function_pointer<T>(); }
-  template<typename T> constexpr bool
-  is_scalar() { return is_pointer<T>() || is_arithmetic<T>() || is_enum<T>() || is_member_pointer<T>(); }
-  template<typename T> constexpr bool
-  is_object() { return is_scalar<T> || is_c_array<T>() || is_union<T>() || is_class<T>(); }
-  template<typename T> constexpr bool
-  is_compound() { return !is_fundamental<T>(); }*/
-
-
-  /*
- * Integral properties
- */
-  // is_signed
-  /*template<typename T>
-  constexpr bool is_signed()
-  { static_assert( is_arithmetic<T>(), "is_signed can only be used on arithmetic types");
-    return implementation::is_signed<T>::result;
-  }
-  // is_unsigned
-  template<typename T>
-  constexpr bool is_unsigned()
+/*
+ * More transforming traits
+ **/
+  namespace implementation
   {
-    static_assert( is_arithmetic<T>(), "is_unsigned can only be used on arithmetic types");
-    return !implementation::is_signed<T>::result;
-  }*/
+    // make_signed
+    template<typename T> struct make_signed { typedef T type; };
+    template<> struct make_signed<unsigned char> { typedef signed char type; };
+    template<> struct make_signed<unsigned short> { typedef signed short type; };
+    template<> struct make_signed<unsigned int> { typedef signed int type; };
+    template<> struct make_signed<unsigned long> { typedef signed long type; };
+    template<> struct make_signed<unsigned long long> { typedef signed long long type; };
+    // make_unsigned
+    template<typename T> struct make_unsigned { typedef T type; };
+    template<> struct make_unsigned<signed char> { typedef unsigned char type; };
+    template<> struct make_unsigned<signed short> { typedef unsigned short type; };
+    template<> struct make_unsigned<signed int> { typedef unsigned int type; };
+    template<> struct make_unsigned<signed long> { typedef unsigned long type; };
+    template<> struct make_unsigned<signed long long> { typedef unsigned long long type; };
+  }
   // make_signed
+  template<typename T> struct make_signed { typedef typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_signed<const T> { typedef const typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_signed<volatile T> { typedef volatile typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_signed<const volatile T> { typedef const volatile typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
   // make_unsigned
-  /*
- * Array properties and transformations
- */
-  // rank
-  /*template<typename T>
-  constexpr size_type rank() { return implementation::rank<T>::result; }
-  template<typename T>
-  constexpr size_type extent() { return implementation::rank<T>::result; }
-  template<typename T>
-  constexpr size_type remove_extent() { return implementation::remove_extent<T>::result; }
-  template<typename T>
-  constexpr size_type remove_all_extents() { return implementation::remove_all_extents<T>::result; }*/
-  /*
- * Member introspection (mostly compiler magic)
- */
-  /*template<typename T>
-  constexpr bool is_pod() { return __is_pod(T); }
-  template<typename T>
-  constexpr bool is_trivial() { return __is_trivial(T); }
-  template<typename T>
-  constexpr bool is_trivially_copyable() { return __has_trivial_copy(T); }
-  template<typename T>
-  constexpr bool is_standard_layout() { return __is_standard_layout(T); }
-  // remove_all_extent scalar
-  template<typename T>
-  constexpr bool is_literal_type() { return __is_literal(T); }
-  // remove_all_extent scalar, remove_all_extent reference
-  template<typename T>
-  constexpr bool is_empty() { return __is_empty(T); }
-  template<typename T>
-  constexpr bool is_polymorphic() { return __is_polymorphic(T); }
-  template<typename T>
-  constexpr bool is_abstract() { return __is_abstract(T); }
-  */
-  //is_constructible
-  // is_default_constructible
-  // is_copy_constructible
-  // is_move_constructible
-  // is_assignable
-  // is_copy_assignable
-  // is_move_assignable
-  // is_destructible
+  template<typename T> struct make_unsigned { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_unsigned<const T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_unsigned<volatile T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_unsigned<const volatile T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
 
-  template<typename T>
-  constexpr bool is_trivially_constructible() { return __has_trivial_copy(T); }
-  // ^ this needs overloads for rvalue refs?
+
+  // is_trivially_constructible
   // is_trivially_default_constructible
   // is_trivially_copy_constructible
   // is_trivially_move_constructible
@@ -370,21 +356,6 @@ namespace kiss
   // is_trivially_move_assignable
   // is_trivially_destructible
 
-
-
-  template<typename T>
-  constexpr bool has_virtual_destructor() { return __has_virtual_destructor(T); }
-
-/*
- * Intertype relations
- */
-  //template<typename T1, typename T2>
-  //constexpr bool is_same() { return implementation::is_same<T1,T2>::result; }
-  //template<typename Base, typename Class>
-  //constexpr bool is_base_of() { return __is_base_of(Base,Class); }
-  // GCC 4.8: unimplemented
-  //template<typename From, typename To>
-  //constexpr bool is_convertible_to() { return __is_convertible_to(From, To); }
 /*
  * Alignment properties and transformations
  */

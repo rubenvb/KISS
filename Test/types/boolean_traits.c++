@@ -20,6 +20,10 @@
 auto l = [](){};
 class Class {};
 class Child : public Class {};
+class ProtectedChild : protected Class{};
+class PrivateChild : private Class {};
+class VirtualChild : virtual Class {};
+class Convertible { constexpr operator Class(); };
 union Union {};
 enum Enum {};
 enum class Enum_class {};
@@ -75,13 +79,86 @@ int main()
   static_assert(!kiss::is_union<Union&&>(),       "Union* recognized as union");
 
 // KISS implementations
+  // is_const
+  static_assert(!kiss::is_const<int>(),                "int recognized as const");
+  static_assert( kiss::is_const<const int>(),          "const int not recognized as const");
+  static_assert(!kiss::is_const<volatile int>(),       "volatile int recognized as const");
+  static_assert( kiss::is_const<const volatile int>(), "const volatile int not recognized as const");
+  static_assert(!kiss::is_const<const int*>(),         "const int* not recognized as const");
+  static_assert( kiss::is_const<int* const>(),         "int* const not recognized as const");
+  static_assert( kiss::is_const<const int* const>(),   "const int* const not recognized as const");
+  static_assert(!kiss::is_const<const int&>(),         "const int& recognized as const");
+  static_assert(!kiss::is_const<const int&&>(),        "const int&& recognized as const");
   // is_convertible
-  static_assert( kiss::is_convertible<double, int>(),    "double not convertible to int");
-  static_assert( kiss::is_convertible<int, double>(),    "int not convertible to double");
-  static_assert( kiss::is_convertible<Child, Class>(),   "Child not convertible to Class");
-  static_assert(!kiss::is_convertible<Class, Child>(),   "Class convertible to Child");
-  static_assert(!kiss::is_convertible<Class*, Child*>(), "Class* convertible to Child*");
-  static_assert( kiss::is_convertible<Child*, Class*>(), "Child* not convertible to Class*");
+  static_assert( kiss::is_convertible<double, int>(),    "double not recognized as convertible to int");
+  static_assert( kiss::is_convertible<int, double>(),    "int not recognized as convertible to double");
+  static_assert( kiss::is_convertible<const int, int>(), "const int not recognized as convertible to int");
+  static_assert( kiss::is_convertible<int, const int>(), "int not recognized as convertible to const int");
+  static_assert(!kiss::is_convertible<int, int&>(),      "int recognized as convertible to int&");
+  static_assert( kiss::is_convertible<int&, int>(),      "int& not recognized as convertible to int");
+  static_assert( kiss::is_convertible<int, int&&>(),     "int not recognized as convertible to int&&");
+  static_assert( kiss::is_convertible<int&&, int>(),     "int&& recognized as convertible to int");
+  static_assert(!kiss::is_convertible<int*, int>(),      "int* recognized as convertible to int");
+  static_assert(!kiss::is_convertible<int, int*>(),      "int recognized as convertible to int*");
+  static_assert( kiss::is_convertible<Child, Class>(),   "Child not recognized as convertible to Class");
+  static_assert(!kiss::is_convertible<Class, Child>(),   "Class recognized as convertible to Child");
+  static_assert(!kiss::is_convertible<Convertible, Class>(), "");
+  static_assert(!kiss::is_convertible<Class*, Child*>(), "Class* recognized as convertible to Child*");
+  static_assert( kiss::is_convertible<Child*, Class*>(), "Child* not recognized as convertible to Class*");
+  // is_lvalue_reference
+  static_assert(!kiss::is_lvalue_reference<int>(),                  "int recognized as lvalue reference");
+  static_assert( kiss::is_lvalue_reference<int&>(),                 "int& not recognized as lvalue reference");
+  static_assert( kiss::is_lvalue_reference<const int&>(),           "const int& not recognized as lvalue reference");
+  static_assert( kiss::is_lvalue_reference<volatile int&>(),        "volatile int& not recognized as lvalue reference");
+  static_assert( kiss::is_lvalue_reference<const volatile int&>(),  "const volatile int& not recognized as lvalue reference");
+  static_assert(!kiss::is_lvalue_reference<int&&>(),                "int&& recognized as lvalue reference");
+  static_assert(!kiss::is_lvalue_reference<const int&&>(),          "const int&& recognized as lvalue reference");
+  static_assert(!kiss::is_lvalue_reference<volatile int&&>(),       "volatile int&& recognized as lvalue reference");
+  static_assert(!kiss::is_lvalue_reference<const volatile int&&>(), "const volatile int&& recognized as lvalue reference");
+  static_assert(!kiss::is_lvalue_reference<int*>(),                 "int* recognized as lvalue reference");
+  // is_nullptr
+  static_assert( kiss::is_nullptr<kiss::nullptr_type>(), "nullptr_type not recognized as nullptr");
+  static_assert(!kiss::is_nullptr<int*>(),               "int* not recognized as nullptr");
+  // is_rvalue_reference
+  static_assert(!kiss::is_rvalue_reference<int>(),                  "int recognized as rvalue reference");
+  static_assert(!kiss::is_rvalue_reference<int&>(),                 "int& recognized as rvalue reference");
+  static_assert(!kiss::is_rvalue_reference<const int&>(),           "const int& recognized as rvalue reference");
+  static_assert(!kiss::is_rvalue_reference<volatile int&>(),        "volatile int& recognized as rvalue reference");
+  static_assert(!kiss::is_rvalue_reference<const volatile int&>(),  "const volatile int& recognized as rvalue reference");
+  static_assert( kiss::is_rvalue_reference<int&&>(),                "int&& not recognized as rvalue reference");
+  static_assert( kiss::is_rvalue_reference<const int&&>(),          "const int&& not recognized as rvalue reference");
+  static_assert( kiss::is_rvalue_reference<volatile int&&>(),       "volatile int&& not recognized as rvalue reference");
+  static_assert( kiss::is_rvalue_reference<const volatile int&&>(), "const volatile int&& not recognized as rvalue reference");
+  static_assert(!kiss::is_rvalue_reference<int*>(),                 "int* recognized as rvalue reference");
+  // is_same
+  static_assert( kiss::is_same<int, int>(),  "int and int not recognized as same type");
+  static_assert(!kiss::is_same<char, int>(), "char and int recognized as same type");
+  //is_volatile
+  static_assert(!kiss::is_volatile<int>(),                    "int recognized as volatile");
+  static_assert(!kiss::is_volatile<const int>(),              "const int recognized as volatile");
+  static_assert( kiss::is_volatile<volatile int>(),           "volatile int not recognized as volatile");
+  static_assert( kiss::is_volatile<const volatile int>(),     "const volatile int not recognized as volatile");
+  static_assert(!kiss::is_volatile<volatile int*>(),          "volatile int* not recognized as volatile");
+  static_assert( kiss::is_volatile<int* volatile>(),          "int* const not recognized as volatile");
+  static_assert( kiss::is_volatile<volatile int* volatile>(), "volatile int* const not recognized as volatile");
+  static_assert(!kiss::is_volatile<volatile int&>(),          "volatile int& recognized as volatile");
+  static_assert(!kiss::is_volatile<volatile int&&>(),         "volatile int&& recognized as volatile");
+
+  // is_base_of
+  static_assert( kiss::is_base_of<Class, Child>(),        "Class not recognized as base of Child");
+  static_assert(!kiss::is_base_of<Child, Class>(),        "Child recognized as base of Class");
+  static_assert(!kiss::is_base_of<PrivateChild, Class>(), "PrivateChild recognized as base of Class");
+  static_assert( kiss::is_base_of<Class, PrivateChild>(), "Class not recognized as base of PrivateChild");
+  static_assert(!kiss::is_base_of<VirtualChild, Class>(), "VirtualChild recognized as base of Class");
+  static_assert( kiss::is_base_of<Class, VirtualChild>(), "Class not recognized as base of VirtualChild");
+  static_assert(!kiss::is_base_of<Class, Convertible>(),  "Class recognized as base of Convertible");
+  static_assert(!kiss::is_base_of<Convertible, Class>(),  "Convertible recognized as base of Class");
+  // is_c_array
+  static_assert( kiss::is_c_array<Class[]>(),         "unknown length array not recognized as C array");
+  static_assert( kiss::is_c_array<const Class[]>(),   "const unknown length array not recognized as C array");
+  static_assert( kiss::is_c_array<Class[42]>(),       "fixed-length array not recognized as C array");
+  static_assert( kiss::is_c_array<const Class[42]>(), "const fixed-length array not recognized as C array");
+  static_assert(!kiss::is_c_array<Class*>(),          "decayed array aka pointer recognized as C array");
 
   // is_void
   static_assert( kiss::is_void<void>(),          "void not recognized as void");
@@ -99,13 +176,6 @@ int main()
   static_assert(!kiss::is_nullptr<volatile kiss::nullptr_type>(), "volatile nullptr_type recognized as nullptr");
   static_assert(!kiss::is_nullptr<Class>(),                       "Class recognized as nullptr");
   static_assert(!kiss::is_nullptr<Class*>(),                      "Class* recognized as nullptr");
-
-  // is_c_array
-  static_assert( kiss::is_c_array<Class[]>(),         "unknown length array not recognized as C array");
-  static_assert( kiss::is_c_array<const Class[]>(),   "const unknown length array not recognized as C array");
-  static_assert( kiss::is_c_array<Class[42]>(),       "fixed-length array not recognized as C array");
-  static_assert( kiss::is_c_array<const Class[42]>(), "const fixed-length array not recognized as C array");
-  static_assert(!kiss::is_c_array<Class*>(),          "decayed array aka pointer recognized as C array");
 
   // is_pointer
   static_assert(!kiss::is_pointer<Class>(),              "Class recognized as pointer");
