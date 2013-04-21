@@ -52,10 +52,10 @@ namespace kiss
 /*
  * integral_constant, true_type, false_type
  **/
-  template<typename T, T value>
+  template<typename T, T valueT>
   struct integral_constant
   {
-    //static constexpr T value = valueT;
+    static constexpr T value = valueT;
     typedef integral_constant<T,value> type;
     constexpr operator T() { return value; }
   };
@@ -95,6 +95,14 @@ namespace kiss
 /*
  * Miscellaneous
  **/
+  namespace implementation
+  {
+    // conditional
+    template<bool, typename First, typename Second> struct conditional { typedef First type; };
+    template<typename First, typename Second> struct conditional<false, First, Second> { typedef Second type; };
+  }
+  // conditional
+  template<bool B, typename First, typename Second> using conditional = typename implementation::conditional<B, First, Second>::type;
   // declval
   template<typename T> typename add_rvalue_reference<T>::type declval() noexcept;
 //TODO decay
@@ -256,39 +264,6 @@ namespace kiss
   template<typename T> struct is_member_function_pointer : implementation::is_member_function_pointer<typename remove_reference<T>::type> {};
 
 /*
- * Signedness
- **/
-  namespace implementation
-  {
-    // make_signed
-    template<typename T> struct make_signed { typedef T type; };
-    template<> struct make_signed<unsigned char> { typedef signed char type; };
-    template<> struct make_signed<unsigned short> { typedef signed short type; };
-    template<> struct make_signed<unsigned int> { typedef signed int type; };
-    template<> struct make_signed<unsigned long> { typedef signed long type; };
-    template<> struct make_signed<unsigned long long> { typedef signed long long type; };
-    // make_unsigned
-    template<typename T> struct make_unsigned { typedef T type; };
-    template<> struct make_unsigned<signed char> { typedef unsigned char type; };
-    template<> struct make_unsigned<signed short> { typedef unsigned short type; };
-    template<> struct make_unsigned<signed int> { typedef unsigned int type; };
-    template<> struct make_unsigned<signed long> { typedef unsigned long type; };
-    template<> struct make_unsigned<signed long long> { typedef unsigned long long type; };
-  }
-  // make_signed
-  template<typename T> struct make_signed { typedef typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_signed<const T> { typedef const typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_signed<volatile T> { typedef volatile typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_signed<const volatile T> { typedef const volatile typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
-  // make_unsigned
-  template<typename T> struct make_unsigned { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_unsigned<const T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_unsigned<volatile T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_unsigned<const volatile T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
-  // is_signed
-  template<typename T> struct is_signed : integral_constant<bool, T(-1) < T(0)> {};
-
-/*
  * Composite type categories
  **/
   // is_reference
@@ -305,6 +280,43 @@ namespace kiss
   template<typename T> struct is_object : integral_constant<bool, is_scalar<T>() || is_c_array<T>() || is_union<T>() || is_class<T>()> {};
   // is_compund
   template<typename T> struct is_compound : integral_constant<bool, !is_fundamental<T>()> {};
+
+/*
+ * Signedness
+ **/
+  namespace implementation
+  {
+    // make_signed
+    template<typename T> struct make_signed { typedef T type; };
+    template<> struct make_signed<char> { typedef signed char type; };
+    template<> struct make_signed<unsigned char> { typedef signed char type; };
+    template<> struct make_signed<unsigned short> { typedef signed short type; };
+    template<> struct make_signed<unsigned int> { typedef signed int type; };
+    template<> struct make_signed<unsigned long> { typedef signed long type; };
+    template<> struct make_signed<unsigned long long> { typedef signed long long type; };
+    // make_unsigned
+    template<typename T> struct make_unsigned { typedef T type; };
+    template<> struct make_unsigned<char> { typedef unsigned char type; };
+    template<> struct make_unsigned<signed char> { typedef unsigned char type; };
+    template<> struct make_unsigned<signed short> { typedef unsigned short type; };
+    template<> struct make_unsigned<signed int> { typedef unsigned int type; };
+    template<> struct make_unsigned<signed long> { typedef unsigned long type; };
+    template<> struct make_unsigned<signed long long> { typedef unsigned long long type; };
+    // is_signed
+    template<typename T> struct is_signed : integral_constant<bool, T(-1) < T(0)> {};
+  }
+  // make_signed
+  template<typename T> struct make_signed { typedef typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_signed<const T> { typedef const typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_signed<volatile T> { typedef volatile typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_signed<const volatile T> { typedef const volatile typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
+  // make_unsigned
+  template<typename T> struct make_unsigned { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_unsigned<const T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_unsigned<volatile T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_unsigned<const volatile T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
+  // is_signed
+  template<typename T> struct is_signed : conditional<is_arithmetic<T>::value, implementation::is_signed<T>, false_type> {};
 
 /*
  * Array properties and transformations

@@ -22,16 +22,19 @@
 
 namespace kiss
 {
-    namespace implementation
-    {
-        // enable_if
-        template<bool, typename T = void> struct enable_if {};
-        template<typename T> struct enable_if<true, T> { typedef T type; };
-    }
-        template <bool Condition, typename T = void> using
-    enable_if = typename implementation::enable_if<Condition, T>::type;
-        template <bool Condition, typename T = void> using
-    disable_if = typename implementation::enable_if<!Condition, T>::type;
+  namespace implementation
+  {
+    // enable_if
+    template<bool, typename T = void> struct enable_if {};
+    template<typename T> struct enable_if<true, T> { typedef T type; };
+    // disable_if
+    template<bool, typename T = void> struct disable_if {};
+    template<typename T> struct disable_if<false, T> { typedef T type; };
+  }
+  // enable_if
+  template<bool Condition, typename T = void> using enable_if = typename implementation::enable_if<Condition, T>::type;
+  // disable_if
+  template<bool Condition, typename T = void> using disable_if = typename implementation::disable_if<Condition, T>::type;
 }
 
 #endif

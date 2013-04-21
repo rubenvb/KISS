@@ -1,12 +1,6 @@
 /**
- * Written in 2013 by Ruben Van Boxem <vanboxem.ruben@gmail.com>
- *
- * To the extent possible under law, the author(s) have dedicated all copyright and related
- * and neighboring rights to this software to the public domain worldwide. This software is
- * distributed without any warranty.
- *
- * You should have received a copy of the CC0 Public Domain Dedication along with this software.
- * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
+ * This file is dual licensed under the MIT and the University of Illinois Open
+ * Source Licenses. See LICENSE.TXT for details.
  *
  ********************************************************************************************/
 
@@ -17,11 +11,50 @@
 
 #include <types.h++>
 
+using namespace kiss;
+
+template <class T, class U>
+void test_is_same()
+{
+    static_assert(is_same<T, U>(), "");
+    static_assert(!is_same<const T, U>(), "");
+    static_assert(!is_same<T, const U>(), "");
+    static_assert(is_same<const T, const U>(), "");
+}
+template <class T, class U>
+void test_is_same_reference()
+{
+    static_assert(is_same<T, U>(), "");
+    static_assert(is_same<const T, U>(), "");
+    static_assert(is_same<T, const U>(), "");
+    static_assert(is_same<const T, const U>(), "");
+}
+template <class T, class U>
+void test_is_not_same()
+{
+    static_assert(!is_same<T, U>(), "");
+}
+
+class Class {};
+
 int main()
 {
   // declval
   // decay
   // common_type
   // result_of
+
   // is_same
+  test_is_same<int, int>();
+  test_is_same<void, void>();
+  test_is_same<Class, Class>();
+  test_is_same<int*, int*>();
+  test_is_same_reference<int&, int&>();
+
+  test_is_not_same<int, void>();
+  test_is_not_same<void, Class>();
+  test_is_not_same<Class, int*>();
+  test_is_not_same<int*, int&>();
+  test_is_not_same<int&, int>();
+
 }

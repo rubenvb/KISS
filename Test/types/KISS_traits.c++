@@ -11,11 +11,15 @@
  ********************************************************************************************/
 
  /*
-  * types/boolean_traits.c++
-  *  Boolean traits tests.
+  * test/types/KISS_traits.c++
+  *  KISS traits tests.
   */
 
 #include <types.h++>
+
+using namespace kiss;
+
+typedef void Function();
 
 int main()
 {
