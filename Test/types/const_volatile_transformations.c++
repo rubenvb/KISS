@@ -17,8 +17,13 @@
 
 #include <types.h++>
 
-
-
 int main()
 {
-    }
+  // remove_const
+  // remove_volatile
+  // remove_cv
+
+  // add_const
+  // add_volatile
+  // add_cv
+}

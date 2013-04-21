@@ -11,30 +11,18 @@
  ********************************************************************************************/
 
  /*
-  * types/misc.cxx
-  *  Miscellaneous traits
+  * types/transforming_traits.c++
+  *  Transforming traits tests.
   */
 
 #include <types.h++>
 
-auto l = [](){};
-class Class {};
-// all sorts of function pointers
-typedef void (function)();
-//typedef const volatile int (cvfunction)();
-typedef void (*fp)();
-//typedef const volatile void (*cvfp)();
-typedef void (Class::*mfp)();
-/*
- * Enable when  r-value for *this is widely available
-typedef void (Class::*mfpr)()&;
-typedef void (Class::*mfprr)()&&;
- */
-typedef void (Class::*cvmfp)() const volatile;
-typedef int Class::*ptm;
-typedef const int Class::* const volatile cvptm;
-typedef decltype(l) lambda;
-
 int main()
 {
+  // add_lvalue_reference
+  // add_rvalue_reference
+  // remove_reference
+
+  // add_pointer
+  // remove_pointer
 }
