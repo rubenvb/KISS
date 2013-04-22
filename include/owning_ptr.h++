@@ -20,10 +20,11 @@
 
 namespace kiss
 {
-  template<typename T>
-  struct default_deleter
+  template <class T> struct default_delete
   {
-    void operator()(T) { delete(T); }
+    constexpr default_delete() noexcept = default;
+    template <class U> default_delete(const default_delete<U>&) noexcept;
+    void operator()(T*) const;
   };
 
   template<typename T, typename D>
@@ -40,10 +41,10 @@ namespace kiss
     constexpr owning_ptr() noexcept
       : data(nullptr), deleter()
       {
-        static_assert(!is_default_constructible<D>(), "Deleter must be default constructible.");
+        static_assert(is_default_constructible<D>(), "Deleter must be default constructible.");
         static_assert(noexcept(D::D()), "Deleter must be noexcept.");
       }
-    explicit owning_ptr(pointer_type p) noexcept
+    explicit owning_ptr(pointer_type p) noexcept;
 
     unique_ptr(const unique_ptr&) = delete;
     unique_ptr& operator=(const unique_ptr&) = delete;

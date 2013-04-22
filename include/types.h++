@@ -105,14 +105,13 @@ namespace kiss
   template<bool B, typename First, typename Second> using conditional = typename implementation::conditional<B, First, Second>::type;
   // declval
   template<typename T> typename add_rvalue_reference<T>::type declval() noexcept;
-//TODO decay
   // common_type
   template<typename ...T> struct common_type;
   template<typename T> struct common_type<T> { typedef T type; };
   template <typename T, typename U> struct common_type<T, U> { typedef decltype(true ? declval<T>() : declval<U>()) type; };
   template <typename T, typename U, typename... V> struct common_type<T, U, V...> { typedef typename common_type<typename common_type<T, U>::type, V...>::type type; };
 //TODO result_of
-  //template <typename Function, typename... Args> struct result_of<Function(Args...)>{ typedef decltype(declval<Fn>()(declval<ArgTypes>()...)) type; };
+  template <typename Function, typename... Args> struct result_of{ typedef decltype(declval<Function>()(declval<Args>()...)) type; };
 
   // is_same
   template<typename, typename> struct is_same : false_type {};
@@ -123,26 +122,44 @@ namespace kiss
  **/
   // is_convertible
   template<typename From, typename To>
-  struct is_convertible{
+  struct is_convertible
+  {
+  private:
     static void foo(To);
     template<typename F>
     static auto test(int) -> decltype(foo(declval<F>()), void(), true_type{});
     template<typename>
     static auto test(...) -> false_type;
-
+  public:
     constexpr operator bool() { return decltype(test<From>(0))(); }
   };
   // is_complete
   template<typename T, typename... Ts>
-  struct is_complete{
+  struct is_complete
+  {
+  private:
     template<unsigned...> void foo();
     template<typename... Us>
     static auto test(int) -> decltype(foo<sizeof(Us)...>(), void(), true_type{});
     template<typename...>
     static auto test(...) -> false_type;
-
+  public:
     constexpr operator bool() { return decltype(test<T, Ts...>(0))(); }
   };
+
+//TODO is_polymorphic_functor
+  //    template<typename T>
+  //    struct is_polymorphic_functor
+  //    {
+  //    private:
+  //      template<typename U, typename V>
+  //      static auto test(U *u, V* v) -> decltype((*u)(*v), void(), false_type); // error here
+  //      template<typename>
+  //      static auto test(...) -> true_type;
+  //      struct foo {};
+  //    public:
+  //      static const bool value = decltype(test((T*)nullptr))();
+  //    };
 
   // is_nullptr
   template<typename> struct is_nullptr : false_type {};
@@ -163,15 +180,10 @@ namespace kiss
  **/
   // add_const
   template<typename T> struct add_const { typedef const T type; };
-  template<typename T> struct add_const<const T> { typedef T type; };
   // add_volatile
   template<typename T> struct add_volatile { typedef volatile T type; };
-  template<typename T> struct add_volatile<volatile T> { typedef T type; };
   // add_cv
   template<typename T> struct add_cv { typedef const volatile T type; };
-  template<typename T> struct add_cv<const T> { typedef volatile T type; };
-  template<typename T> struct add_cv<volatile T> { typedef const T type; };
-  template<typename T> struct add_cv<const volatile T> { typedef T type; };
 
   // remove_const
   template<typename T> struct remove_const { typedef T type; };
@@ -180,8 +192,7 @@ namespace kiss
   template<typename T> struct remove_volatile { typedef T type; };
   template<typename T> struct remove_volatile<volatile T> { typedef T type; };
   // remove_cv
-  template<typename T> struct remove_cv
-  { typedef typename remove_volatile<typename remove_const<T>::type>::type type; };
+  template<typename T> struct remove_cv { typedef typename remove_volatile<typename remove_const<T>::type>::type type; };
 
 /*
  * Primary type categories
@@ -338,6 +349,19 @@ namespace kiss
   template<typename T> struct remove_all_extents { typedef T type; };
   template<typename T> struct remove_all_extents<T[]> { typedef typename remove_all_extents<T>::type type; };
   template<typename T, size_type N> struct remove_all_extents<T[N]> { typedef typename remove_all_extents<T>::type type; };
+  // decay
+  template <class T>
+  struct decay
+  {
+  private:
+    typedef typename remove_reference<T>::type U;
+  public:
+    typedef conditional<is_c_array<U>::value,
+                        typename remove_extent<U>::type*,
+                        conditional<is_function<U>::value,
+                                    typename add_pointer<U>::type,
+                                    typename remove_cv<U>::type>> type;
+  };
 
 /*
  * Memory properties
