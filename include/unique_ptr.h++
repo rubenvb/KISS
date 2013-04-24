@@ -11,12 +11,12 @@
  ********************************************************************************************/
 
 /*
- * owning_ptr.h++
+ * unique_ptr.h++
  *  Smart pointer that holds exclusive ownership of its data.
  **/
 
-#ifndef KISS_oWNING_PTR
-#define KISS_oWNING_PTR
+#ifndef KISS_UNIQUE_PTR
+#define KISS_UNIQUE_PTR
 
 #include "tmp.h++"
 #include "types.h++"
@@ -39,43 +39,48 @@ namespace kiss
     template<typename U> void operator()(U*) const = delete;
     };
 /*
- * owning_ptr - unique_ptr clone
+ * unique_ptr - unique_ptr clone
  **/
   template<typename T, typename D = default_delete<T>>
-  class owning_ptr
+  class unique_ptr
   {
   public:
     using element_type = T;
     using deleter_type = D;
-    using A            = remove_cv<typename remove_reference<D>::type>::type;
-    using pointer      = add_pointer<element_type>();
+    using A            = typename remove_cv<typename remove_reference<D>::type>::type;
+    using pointer      = typename add_pointer<element_type>::type;
   private:
     pointer ptr;
     deleter_type deleter;
 
   public:
     // constructors
-    constexpr owning_ptr() noexcept : pointer(nullptr), deleter()
+    constexpr unique_ptr() noexcept : ptr(), deleter()
     {
       static_assert(is_nothrow_default_constructible<D>(), "Deleter must be default constructible.");
+      static_assert(is_pointer<D>() || is_reference<D>(), "Deleter cannot be a pointer or reference type here.");
     }
-    explicit owning_ptr(pointer p) noexcept;
-    owning_ptr(pointer p, enable_if<!is_reference<D>::value, const A&> d) : ptr(p), deleter(d) {}
-    owning_ptr(pointer p, enable_if<!is_reference<D>::value || is_lvalue_reference<D>::value, A&&> d);
-    owning_ptr(pointer p, enable_if<is_lvalue_reference<D>::value, A&> d)
-    owning_ptr(pointer p, enable_if<is_lvalue_reference<D>::value, A&&> d);
-    owning_ptr(pointer p, enable_if<is_rvalue_reference<D>::value, const A&> d);
-    owning_ptr(pointer p, enable_if<is_rvalue_reference<D>::value, const A&&> d);
+    explicit unique_ptr(pointer p) noexcept : ptr(p), deleter()
+    {
+      static_assert(is_nothrow_default_constructible<D>(), "Deleter must be default constructible.");
+      static_assert(is_pointer<D>() || is_reference<D>(), "Deleter cannot be a pointer or reference type here.");
+    }
+    unique_ptr(pointer p, conditional<is_reference<D>::value, D, typename add_lvalue_reference<const D>::type> d) : ptr(p), deleter(d) {}
+    unique_ptr(pointer p, enable_if<!is_reference<D>::value || is_lvalue_reference<D>::value, A&&> d);
+    unique_ptr(pointer p, enable_if<is_lvalue_reference<D>::value, A&> d);
+    unique_ptr(pointer p, enable_if<is_lvalue_reference<D>::value, A&&> d);
+    unique_ptr(pointer p, enable_if<is_rvalue_reference<D>::value, const A&> d);
+    unique_ptr(pointer p, enable_if<is_rvalue_reference<D>::value, const A&&> d);
 
-    virtual ~owning_ptr() { D(ptr); }
+    virtual ~unique_ptr() { D(ptr); }
 
     // no copying from lvalues
-    owning_ptr(const owning_ptr&) = delete;
-    owning_ptr& operator=(const owning_ptr&) = delete;
+    unique_ptr(const unique_ptr&) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
   };
   // class template specialization for array types
   template<typename T, typename D>
-  class owning_ptr<T[], D>
+  class unique_ptr<T[], D>
   {
   };
 
@@ -95,29 +100,29 @@ namespace kiss
   template<typename T1, typename D1, typename T2, typename D2>
   bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);
   template <typename T, typename D>
-  bool operator==(const unique_ptr<T, D>& x, nullptr_t) noexcept;
+  bool operator==(const unique_ptr<T, D>& x, nullptr_type) noexcept;
   template <typename T, typename D>
-  bool operator==(nullptr_t, const unique_ptr<T, D>& y) noexcept;
+  bool operator==(nullptr_type, const unique_ptr<T, D>& y) noexcept;
   template <typename T, typename D>
-  bool operator!=(const unique_ptr<T, D>& x, nullptr_t) noexcept;
+  bool operator!=(const unique_ptr<T, D>& x, nullptr_type) noexcept;
   template <typename T, typename D>
-  bool operator!=(nullptr_t, const unique_ptr<T, D>& y) noexcept;
+  bool operator!=(nullptr_type, const unique_ptr<T, D>& y) noexcept;
   template <typename T, typename D>
-  bool operator<(const unique_ptr<T, D>& x, nullptr_t);
+  bool operator<(const unique_ptr<T, D>& x, nullptr_type);
   template <typename T, typename D>
-  bool operator<(nullptr_t, const unique_ptr<T, D>& y);
+  bool operator<(nullptr_type, const unique_ptr<T, D>& y);
   template <typename T, typename D>
-  bool operator<=(const unique_ptr<T, D>& x, nullptr_t);
+  bool operator<=(const unique_ptr<T, D>& x, nullptr_type);
   template <typename T, typename D>
-  bool operator<=(nullptr_t, const unique_ptr<T, D>& y);
+  bool operator<=(nullptr_type, const unique_ptr<T, D>& y);
   template <typename T, typename D>
-  bool operator>(const unique_ptr<T, D>& x, nullptr_t);
+  bool operator>(const unique_ptr<T, D>& x, nullptr_type);
   template <typename T, typename D>
-  bool operator>(nullptr_t, const unique_ptr<T, D>& y);
+  bool operator>(nullptr_type, const unique_ptr<T, D>& y);
   template <typename T, typename D>
-  bool operator>=(const unique_ptr<T, D>& x, nullptr_t);
+  bool operator>=(const unique_ptr<T, D>& x, nullptr_type);
   template <typename T, typename D>
-  bool operator>=(nullptr_t, const unique_ptr<T, D>& y);
+  bool operator>=(nullptr_type, const unique_ptr<T, D>& y);
 }
 
 #endif

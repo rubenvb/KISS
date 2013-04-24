@@ -28,26 +28,26 @@ namespace kiss
  * Basic types
  **/
   // pointer and size types
-  typedef decltype(nullptr)           nullptr_type;
-  typedef decltype(sizeof(0))         size_type;
-  typedef decltype((char*)0-(char*)0) ptrdiff_type;
+  using nullptr_type = decltype(nullptr);
+  using size_type    = decltype(sizeof(0));
+  using ptrdiff_type = decltype((char*)0-(char*)0);
 
   // fixed-width signed integers
-  typedef signed char      int8;
-  typedef signed short     int16;
-  typedef signed int       int32;
-  typedef signed long long int64;
+  using int8  = signed char;
+  using int16 = signed short;
+  using int32 = signed int;
+  using int64 = signed long long;
 
   // fixed width unsigned integers
-  typedef unsigned char      uint8;
-  typedef unsigned short     uint16;
-  typedef unsigned int       uint32;
-  typedef unsigned long long uint64;
+  using uint8  = unsigned char;
+  using uint16 = unsigned short;
+  using uint32 = unsigned int;
+  using uint64 = unsigned long long;
 
   // UTF character types
-  typedef char    char8;
-  typedef char16_t char16;
-  typedef char32_t char32;
+  using char8  = char;
+  using char16 = char16_t;
+  using char32 = char32_t;
 
 /*
  * integral_constant, true_type, false_type
@@ -56,41 +56,40 @@ namespace kiss
   struct integral_constant
   {
     static constexpr T value = valueT;
-    typedef integral_constant<T,value> type;
+    using type = integral_constant<T,value>;
     constexpr operator T() { return value; }
   };
-  // true_type
-  typedef integral_constant<bool, true> true_type;
-  // false_type
-  typedef integral_constant<bool, false> false_type;
+  // true_type/false_type
+  using true_type = integral_constant<bool, true>;
+  using false_type = integral_constant<bool, false>;
 
 /*
  * reference-pointer transformations
  **/
   // add_lvalue_reference
-  template<typename T> struct add_lvalue_reference { typedef T& type; };
-  template<> struct add_lvalue_reference<void> { typedef void type; };
-  template<> struct add_lvalue_reference<const void> { typedef const void type; };
-  template<> struct add_lvalue_reference<volatile void> { typedef volatile void type; };
-  template<> struct add_lvalue_reference<const volatile void>  {typedef const volatile void type; };
+  template<typename T> struct add_lvalue_reference { using type = T&; };
+  template<> struct add_lvalue_reference<void> { using type = void; };
+  template<> struct add_lvalue_reference<const void> { using type = const void; };
+  template<> struct add_lvalue_reference<volatile void> { using type = volatile void; };
+  template<> struct add_lvalue_reference<const volatile void>  { using type = const volatile void; };
   // add_rvalue_reference
-  template<typename T> struct add_rvalue_reference { typedef T&& type; };
-  template<> struct add_rvalue_reference<void> { typedef void type; };
-  template<> struct add_rvalue_reference<const void> { typedef const void type; };
-  template<> struct add_rvalue_reference<volatile void> { typedef volatile void type; };
-  template<> struct add_rvalue_reference<const volatile void> { typedef const volatile void type; };
+  template<typename T> struct add_rvalue_reference { using type = T&&; };
+  template<> struct add_rvalue_reference<void> { using type = void; };
+  template<> struct add_rvalue_reference<const void> { using type = const void; };
+  template<> struct add_rvalue_reference<volatile void> { using type = volatile void; };
+  template<> struct add_rvalue_reference<const volatile void> { using type = const volatile void; };
 
   // remove_reference
-  template <typename T> struct remove_reference      { typedef T type; };
-  template <typename T> struct remove_reference<T&>  { typedef T type; };
-  template <typename T> struct remove_reference<T&&> { typedef T type; };
+  template <typename T> struct remove_reference      { using type = T; };
+  template <typename T> struct remove_reference<T&>  { using type = T; };
+  template <typename T> struct remove_reference<T&&> { using type = T; };
 
   // add_pointer
-  template<typename T> struct add_pointer { typedef typename remove_reference<T>::type* type; };
+  template<typename T> struct add_pointer { using type = typename remove_reference<T>::type*; };
 
   // remove_pointer
-  template<typename T> struct remove_pointer { typedef T type; };
-  template<typename T> struct remove_pointer<T*> { typedef T type; };
+  template<typename T> struct remove_pointer { using type = T; };
+  template<typename T> struct remove_pointer<T*> { using type = T; };
 
 /*
  * Miscellaneous
@@ -98,8 +97,8 @@ namespace kiss
   namespace implementation
   {
     // conditional
-    template<bool, typename First, typename Second> struct conditional { typedef First type; };
-    template<typename First, typename Second> struct conditional<false, First, Second> { typedef Second type; };
+    template<bool, typename First, typename Second> struct conditional { using type = First; };
+    template<typename First, typename Second> struct conditional<false, First, Second> { using type = Second; };
   }
   // conditional
   template<bool B, typename First, typename Second> using conditional = typename implementation::conditional<B, First, Second>::type;
@@ -107,11 +106,11 @@ namespace kiss
   template<typename T> typename add_rvalue_reference<T>::type declval() noexcept;
   // common_type
   template<typename ...T> struct common_type;
-  template<typename T> struct common_type<T> { typedef T type; };
-  template <typename T, typename U> struct common_type<T, U> { typedef decltype(true ? declval<T>() : declval<U>()) type; };
-  template <typename T, typename U, typename... V> struct common_type<T, U, V...> { typedef typename common_type<typename common_type<T, U>::type, V...>::type type; };
+  template<typename T> struct common_type<T> { using type = T; };
+  template <typename T, typename U> struct common_type<T, U> { using type = decltype(true ? declval<T>() : declval<U>()); };
+  template <typename T, typename U, typename... V> struct common_type<T, U, V...> { using type = typename common_type<typename common_type<T, U>::type, V...>::type; };
 //TODO result_of
-  template <typename Function, typename... Args> struct result_of{ typedef decltype(declval<Function>()(declval<Args>()...)) type; };
+  template <typename Function, typename... Args> struct result_of{ using type = decltype(declval<Function>()(declval<Args>()...)); };
 
   // is_same
   template<typename, typename> struct is_same : false_type {};
@@ -179,20 +178,20 @@ namespace kiss
  * const-volatile transformations
  **/
   // add_const
-  template<typename T> struct add_const { typedef const T type; };
+  template<typename T> struct add_const { using type = const T; };
   // add_volatile
-  template<typename T> struct add_volatile { typedef volatile T type; };
+  template<typename T> struct add_volatile { using type = volatile T; };
   // add_cv
-  template<typename T> struct add_cv { typedef const volatile T type; };
+  template<typename T> struct add_cv { using type = const volatile T; };
 
   // remove_const
-  template<typename T> struct remove_const { typedef T type; };
-  template<typename T> struct remove_const<const T> { typedef T type; };
+  template<typename T> struct remove_const { using type = T; };
+  template<typename T> struct remove_const<const T> { using type = T; };
   // remove_volatile
-  template<typename T> struct remove_volatile { typedef T type; };
-  template<typename T> struct remove_volatile<volatile T> { typedef T type; };
+  template<typename T> struct remove_volatile { using type = T; };
+  template<typename T> struct remove_volatile<volatile T> { using type = T; };
   // remove_cv
-  template<typename T> struct remove_cv { typedef typename remove_volatile<typename remove_const<T>::type>::type type; };
+  template<typename T> struct remove_cv { using type = typename remove_volatile<typename remove_const<T>::type>::type; };
 
 /*
  * Primary type categories
@@ -298,34 +297,34 @@ namespace kiss
   namespace implementation
   {
     // make_signed
-    template<typename T> struct make_signed { typedef T type; };
-    template<> struct make_signed<char> { typedef signed char type; };
-    template<> struct make_signed<unsigned char> { typedef signed char type; };
-    template<> struct make_signed<unsigned short> { typedef signed short type; };
-    template<> struct make_signed<unsigned int> { typedef signed int type; };
-    template<> struct make_signed<unsigned long> { typedef signed long type; };
-    template<> struct make_signed<unsigned long long> { typedef signed long long type; };
+    template<typename T> struct make_signed { using type = T; };
+    template<> struct make_signed<char> { using type = signed char; };
+    template<> struct make_signed<unsigned char> { using type = signed char; };
+    template<> struct make_signed<unsigned short> { using type = signed short; };
+    template<> struct make_signed<unsigned int> { using type = signed int; };
+    template<> struct make_signed<unsigned long> { using type = signed long; };
+    template<> struct make_signed<unsigned long long> { using type = signed long long; };
     // make_unsigned
-    template<typename T> struct make_unsigned { typedef T type; };
-    template<> struct make_unsigned<char> { typedef unsigned char type; };
-    template<> struct make_unsigned<signed char> { typedef unsigned char type; };
-    template<> struct make_unsigned<signed short> { typedef unsigned short type; };
-    template<> struct make_unsigned<signed int> { typedef unsigned int type; };
-    template<> struct make_unsigned<signed long> { typedef unsigned long type; };
-    template<> struct make_unsigned<signed long long> { typedef unsigned long long type; };
+    template<typename T> struct make_unsigned { using type = T; };
+    template<> struct make_unsigned<char> { using type = unsigned char; };
+    template<> struct make_unsigned<signed char> { using type = unsigned char; };
+    template<> struct make_unsigned<signed short> { using type = unsigned short; };
+    template<> struct make_unsigned<signed int> { using type = unsigned int; };
+    template<> struct make_unsigned<signed long> { using type = unsigned long; };
+    template<> struct make_unsigned<signed long long> { using type = unsigned long long; };
     // is_signed
     template<typename T> struct is_signed : integral_constant<bool, T(-1) < T(0)> {};
   }
   // make_signed
-  template<typename T> struct make_signed { typedef typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_signed<const T> { typedef const typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_signed<volatile T> { typedef volatile typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_signed<const volatile T> { typedef const volatile typename implementation::make_signed<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_signed { using type = typename implementation::make_signed<typename remove_cv<T>::type>::type; };
+  template<typename T> struct make_signed<const T> { using type = const typename implementation::make_signed<typename remove_cv<T>::type>::type; };
+  template<typename T> struct make_signed<volatile T> { using type = volatile typename implementation::make_signed<typename remove_cv<T>::type>::type; };
+  template<typename T> struct make_signed<const volatile T> { using type = const volatile typename implementation::make_signed<typename remove_cv<T>::type>::type; };
   // make_unsigned
-  template<typename T> struct make_unsigned { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_unsigned<const T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_unsigned<volatile T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
-  template<typename T> struct make_unsigned<const volatile T> { typedef typename implementation::make_unsigned<typename remove_cv<T>::type>::type type; };
+  template<typename T> struct make_unsigned { using type = typename implementation::make_unsigned<typename remove_cv<T>::type>::type; };
+  template<typename T> struct make_unsigned<const T> { using type = typename implementation::make_unsigned<typename remove_cv<T>::type>::type; };
+  template<typename T> struct make_unsigned<volatile T> { using type = typename implementation::make_unsigned<typename remove_cv<T>::type>::type; };
+  template<typename T> struct make_unsigned<const volatile T> { using type = typename implementation::make_unsigned<typename remove_cv<T>::type>::type; };
   // is_signed
   template<typename T> struct is_signed : conditional<is_arithmetic<T>::value, implementation::is_signed<T>, false_type> {};
 
@@ -342,25 +341,25 @@ namespace kiss
   template<typename T, size_type N, size_type S> struct extent<T[S], N> : integral_constant<size_type, N==0 ? 0 : extent<T,N-1>::result> {};
 
   // remove_extent
-  template<typename T> struct remove_extent { typedef T type; };
-  template<typename T> struct remove_extent<T[]> { typedef T type; };
-  template<typename T, size_type N> struct remove_extent<T[N]> { typedef T type; };
+  template<typename T> struct remove_extent { using type = T; };
+  template<typename T> struct remove_extent<T[]> { using type = T; };
+  template<typename T, size_type N> struct remove_extent<T[N]> { using type = T; };
   // remove_all_extents
-  template<typename T> struct remove_all_extents { typedef T type; };
-  template<typename T> struct remove_all_extents<T[]> { typedef typename remove_all_extents<T>::type type; };
-  template<typename T, size_type N> struct remove_all_extents<T[N]> { typedef typename remove_all_extents<T>::type type; };
+  template<typename T> struct remove_all_extents { using type = T; };
+  template<typename T> struct remove_all_extents<T[]> { using type = typename remove_all_extents<T>::type; };
+  template<typename T, size_type N> struct remove_all_extents<T[N]> { using type = typename remove_all_extents<T>::type; };
   // decay
   template <class T>
   struct decay
   {
   private:
-    typedef typename remove_reference<T>::type U;
+    using U = typename remove_reference<T>::type;
   public:
-    typedef conditional<is_c_array<U>::value,
-                        typename remove_extent<U>::type*,
-                        conditional<is_function<U>::value,
-                                    typename add_pointer<U>::type,
-                                    typename remove_cv<U>::type>> type;
+    using type = conditional<is_c_array<U>::value,
+                             typename remove_extent<U>::type*,
+                             conditional<is_function<U>::value,
+                                         typename add_pointer<U>::type,
+                                         typename remove_cv<U>::type>>;
   };
 
 /*
@@ -470,7 +469,7 @@ namespace kiss
  * Inheritance properties
  **/
 //TODO INTRINSIC underlying_type
-  template<typename T> struct underlying_type { typedef __underlying_type(T) type; };
+  template<typename T> struct underlying_type { using type = __underlying_type(T); };
 //TODO INTRINSIC has_virtual_destructor
   template<typename T> struct has_virtual_destructor : integral_constant<bool, __has_virtual_destructor(T)> {};
 //TODO INTRINSIC is_base_of
@@ -499,7 +498,12 @@ namespace kiss
  */
   template<typename T>
   constexpr size_type alignment_of(const T t) { return __alignof__(t); }
-  // aligned_storage
+//TODO aligned_storage - needs default argument
+  template<size_type size, size_type alignment>
+  struct aligned_storage
+  {
+    using type = struct { alignas(alignment) unsigned char data[size]; };
+  };
 }
 
 /*
@@ -518,12 +522,12 @@ namespace std
   template<typename E> class initializer_list
   {
   public:
-    typedef E        value_type;
-    typedef const E& reference;
-    typedef const E& const_reference;
-    typedef kiss::size_type size_type;
-    typedef const E* iterator;
-    typedef const E* const_iterator;
+    using value_type      = E;
+    using reference       = const E&;
+    using const_reference = const E&;
+    using size_type       = kiss::size_type;
+    using iterator        = const E*;
+    using const_iterator  = const E*;
     initializer_list();
     kiss::size_type size() const;
     const E* begin() const;

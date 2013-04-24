@@ -20,6 +20,11 @@
 
 namespace kiss
 {
+  //T& get(array<T, size>&) noexcept;
+  //template<size_t index, typename T, size_type size>
+  //const T& get(const array<T, size>&) noexcept;
+  //template <size_t index, typename T, size_type size>
+  //T&& get(array<T, size>&&) noexcept;
   // Fixed-size
   template<typename T, kiss::size_type N>
   class array

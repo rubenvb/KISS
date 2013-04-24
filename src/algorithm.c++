@@ -14,3 +14,5 @@
   * algorithm.cxx
   *  KISS algorithms implementation.
   */
+
+#include "unique_ptr.h++"
