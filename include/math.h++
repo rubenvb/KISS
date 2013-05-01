@@ -15,8 +15,8 @@
  *  Math functions.
  **/
 
-#ifndef KISS_MATH
-#define KISS_MATH
+#ifndef KISS_MATH_H
+#define KISS_MATH_H
 
 #include "config.h++"
 #include "error.h++"

@@ -15,8 +15,8 @@
  *  Equivalent to C++'s std::function.
  **/
 
-#ifndef KISS_FUNCTION
-#define KISS_FUNCTION
+#ifndef KISS_FUNCTION_H
+#define KISS_FUNCTION_H
 
 #include "config.h++"
 #include "utility.h++"

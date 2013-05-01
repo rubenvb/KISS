@@ -15,8 +15,8 @@
  *  Numerical limits.
  **/
 
-#ifndef KISS_LIMITS
-#define KISS_LIMITS
+#ifndef KISS_LIMITS_H
+#define KISS_LIMITS_H
 
 #include "config.h++"
 #include "types.h++"

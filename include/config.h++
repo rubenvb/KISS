@@ -15,12 +15,14 @@
  *  Miscellaneous configuration.
  **/
 
-#ifndef KISS_CONFIG
-#define KISS_CONFIG
+#ifndef KISS_CONFIG_H
+#define KISS_CONFIG_H
 
 #if defined(_MSC_VER) && !defined(__clang__) && !defined(__ICL)
 #error "this shit is broken anyway"
 #define constexpr const
+#define __alignof__(type) __alignof(type)
+#define alignas(number) __declspec(align(number))
 typedef wchar_t       char16_t;
 typedef unsigned long char32_t;
 #endif

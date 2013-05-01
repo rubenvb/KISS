@@ -15,8 +15,8 @@
  *  Utility functions.
  **/
 
-#ifndef KISS_UTILITY
-#define KISS_UTILITY
+#ifndef KISS_UTILITY_H
+#define KISS_UTILITY_H
 
 #include "types.h++"
 

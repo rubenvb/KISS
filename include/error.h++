@@ -16,8 +16,8 @@
  *  KISS error exceptions.
  **/
 
-#ifndef KISS_ERROR
-#define KISS_ERROR
+#ifndef KISS_ERROR_H
+#define KISS_ERROR_H
 
 namespace kiss {
   class error;

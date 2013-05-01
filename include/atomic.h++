@@ -10,9 +10,30 @@
  *
  ********************************************************************************************/
 
- /*
-  * algorithm.cxx
-  *  KISS algorithms implementation.
-  */
+/*
+ * atomic.h++
+ *  KISS atomics.
+ **/
 
-#include "tuple.h++"
+#ifndef KISS_ATOMIC_H
+#define KISS_ATOMIC_H
+
+namespace kiss
+{
+  namespace atomic
+  {
+  /*
+   * arithmetic
+   **/
+    template<typename T> inline T increment(T& t) noexcept
+    {
+      return __sync_add_and_fetch(&t, 1);
+    }
+    template<typename T> inline T decrement(T& t) noexcept
+    {
+      return __sync_add_and_fetch(&t, -1);
+    }
+  }
+}
+
+#endif

@@ -15,8 +15,8 @@
  *  Smart pointer that holds exclusive ownership of its data.
  **/
 
-#ifndef KISS_UNIQUE_PTR
-#define KISS_UNIQUE_PTR
+#ifndef KISS_UNIQUE_PTR_H
+#define KISS_UNIQUE_PTR_H
 
 #include "tmp.h++"
 #include "types.h++"

@@ -12,10 +12,10 @@
 
 /*
  * algorithm.h++
- *  KISS algorithms.
+ *  Generic algorithms.
  **/
 
-#ifndef KISS_ALGORITHM
-#define KISS_ALGORITHM
+#ifndef KISS_ALGORITHM_H
+#define KISS_ALGORITHM_H
 
 #endif

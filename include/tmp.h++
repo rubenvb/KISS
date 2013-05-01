@@ -15,8 +15,8 @@
  *  Template meta programming constructs.
  **/
 
-#ifndef KISS_TMP
-#define KISS_TMP
+#ifndef KISS_TMP_H
+#define KISS_TMP_H
 
 #include "config.h++"
 

@@ -18,7 +18,7 @@
  *   - ...
  **/
 
-#ifndef KISS_SYSTEM
-#define KISS_SySTEM
+#ifndef KISS_SYSTEM_H
+#define KISS_SySTEM_H
 
 #endif

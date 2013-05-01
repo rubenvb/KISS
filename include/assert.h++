@@ -10,9 +10,37 @@
  *
  ********************************************************************************************/
 
- /*
-  * algorithm.cxx
-  *  KISS algorithms implementation.
-  */
+/*
+ * assert.h++
+ * Assertion macro which can be enabled by defining KISS_ASSERT
+ *
+ **/
 
-#include "tuple.h++"
+#ifndef KISS_ASSERT_H
+#define KISS_ASSERT_H
+
+namespace kiss
+{
+  namespace C
+  {
+    extern "C" { void exit(int); }
+  }
+  namespace implementation
+  {
+    inline void assert(bool condition, const char*)
+    {
+      if(!condition)
+      {
+        //TODO: output
+        C::exit(1);
+      }
+    }
+  }
+}
+#ifdef KISS_ASSERT
+#define assert
+#else
+
+#endif
+
+#endif
