@@ -17,7 +17,6 @@
 #ifndef KISS_PAIR_H
 #define KISS_PAIR_H
 
-#include "ref.h++"
 #include "tmp.h++"
 #include "types.h++"
 
@@ -35,8 +34,24 @@ namespace kiss
   // pair taking advantage of the empty base class optimization
   namespace implementation
   {
-    template<typename> struct empty_first_base {};
-    template<typename> struct empty_second_base {};
+    // empty base classes using a static data member: T is empty so it doesn't matter whatsoever if it's static
+    template<typename T> struct empty_first_base
+    {
+      static T first;
+      constexpr empty_first_base(const T& f) {}
+      template<typename U>
+      constexpr empty_first_base(U&&) {}
+    };
+    template<typename T> T empty_first_base<T>::first;
+    template<typename T> struct empty_second_base
+    {
+      static T second;
+      constexpr empty_second_base(const T&) {}
+      template<typename U>
+      constexpr empty_second_base(U&&) {}
+    };
+    template<typename T> T empty_second_base<T>::second;
+    // base classes defining a member first and second
     template<typename T> struct first_base
     {
       T first;
@@ -52,6 +67,7 @@ namespace kiss
       constexpr second_base(U&& s) : second(T(s)) {}
     };
   }
+  // pair - compressed for empty types using the Empty Base Class optimization
   template<typename T1, typename T2>
   struct pair : conditional<is_empty<T1>::value,
                             implementation::empty_first_base<T1>,

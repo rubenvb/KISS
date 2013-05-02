@@ -18,6 +18,7 @@
 #ifndef KISS_UNIQUE_PTR_H
 #define KISS_UNIQUE_PTR_H
 
+#include "pair.h++"
 #include "tmp.h++"
 #include "types.h++"
 
@@ -47,32 +48,33 @@ namespace kiss
   public:
     using element_type = T;
     using deleter_type = D;
-    using A            = typename remove_cv<typename remove_reference<D>::type>::type;
-    using pointer      = typename add_pointer<element_type>::type;
+    using pointer_type = typename add_pointer<element_type>::type;
   private:
-    pointer ptr;
-    deleter_type deleter;
+    pair<pointer_type, deleter_type> data;
 
   public:
     // constructors
-    constexpr unique_ptr() noexcept : ptr(), deleter()
+    constexpr unique_ptr() noexcept : data()
     {
       static_assert(is_nothrow_default_constructible<D>(), "Deleter must be default constructible.");
       static_assert(is_pointer<D>() || is_reference<D>(), "Deleter cannot be a pointer or reference type here.");
     }
-    explicit unique_ptr(pointer p) noexcept : ptr(p), deleter()
+    explicit unique_ptr(pointer_type p) noexcept : data(p, deleter_type())
     {
       static_assert(is_nothrow_default_constructible<D>(), "Deleter must be default constructible.");
       static_assert(is_pointer<D>() || is_reference<D>(), "Deleter cannot be a pointer or reference type here.");
     }
-    unique_ptr(pointer p, conditional<is_reference<D>::value, D, typename add_lvalue_reference<const D>::type> d) : ptr(p), deleter(d) {}
-    unique_ptr(pointer p, enable_if<!is_reference<D>::value || is_lvalue_reference<D>::value, A&&> d);
-    unique_ptr(pointer p, enable_if<is_lvalue_reference<D>::value, A&> d);
-    unique_ptr(pointer p, enable_if<is_lvalue_reference<D>::value, A&&> d);
-    unique_ptr(pointer p, enable_if<is_rvalue_reference<D>::value, const A&> d);
-    unique_ptr(pointer p, enable_if<is_rvalue_reference<D>::value, const A&&> d);
+  private: // TODO get rid of
+    using A = typename remove_cv<typename remove_reference<D>::type>::type;
+  public:
+    unique_ptr(pointer_type p, conditional<is_reference<D>::value, D, typename add_lvalue_reference<const D>::type> d) : data(p, d) {}
+    unique_ptr(pointer_type p, enable_if<!is_reference<D>::value || is_lvalue_reference<D>::value, A&&> d);
+    unique_ptr(pointer_type p, enable_if<is_lvalue_reference<D>::value, A&> d);
+    unique_ptr(pointer_type p, enable_if<is_lvalue_reference<D>::value, A&&> d);
+    unique_ptr(pointer_type p, enable_if<is_rvalue_reference<D>::value, const A&> d);
+    unique_ptr(pointer_type p, enable_if<is_rvalue_reference<D>::value, const A&&> d);
 
-    virtual ~unique_ptr() { D(ptr); }
+    virtual ~unique_ptr() { data.second.operator()(data.first); }
 
     // no copying from lvalues
     unique_ptr(const unique_ptr&) = delete;
