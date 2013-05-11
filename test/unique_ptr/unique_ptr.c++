@@ -10,20 +10,17 @@
  *
  ********************************************************************************************/
 
- /*
-  * test/types/KISS_traits.c++
-  *  KISS traits tests.
-  */
+/*
+ * test/types/unique_ptr.c++
+ **/
 
-#include <types.h++>
+#include "unique_ptr.h++"
 
 using namespace kiss;
 
-typedef void Function();
-
 int main()
 {
-  // is_convertible
-  // is_complete
-  // is_nullptr
+  static_assert(sizeof(pair<int*, default_delete<int*>>) == sizeof(int*), "");
+  static_assert(sizeof(unique_ptr<int>) == sizeof(int*), "");
+  static_assert(false, "unimplemented");
 }

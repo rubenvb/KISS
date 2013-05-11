@@ -21,4 +21,6 @@
 #ifndef KISS_SYSTEM_H
 #define KISS_SySTEM_H
 
+#include "config.h++"
+
 #endif

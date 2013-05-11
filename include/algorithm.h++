@@ -18,4 +18,6 @@
 #ifndef KISS_ALGORITHM_H
 #define KISS_ALGORITHM_H
 
+#include "config.h++"
+
 #endif

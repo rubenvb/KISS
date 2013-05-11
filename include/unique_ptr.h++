@@ -18,8 +18,8 @@
 #ifndef KISS_UNIQUE_PTR_H
 #define KISS_UNIQUE_PTR_H
 
+#include "config.h++"
 #include "pair.h++"
-#include "tmp.h++"
 #include "types.h++"
 
 namespace kiss
@@ -59,22 +59,30 @@ namespace kiss
       static_assert(is_nothrow_default_constructible<D>(), "Deleter must be default constructible.");
       static_assert(is_pointer<D>() || is_reference<D>(), "Deleter cannot be a pointer or reference type here.");
     }
-    explicit unique_ptr(pointer_type p) noexcept : data(p, deleter_type())
+    explicit unique_ptr(pointer_type pointer) noexcept : data(pointer, deleter_type())
     {
       static_assert(is_nothrow_default_constructible<D>(), "Deleter must be default constructible.");
       static_assert(is_pointer<D>() || is_reference<D>(), "Deleter cannot be a pointer or reference type here.");
     }
-  private: // TODO get rid of
-    using A = typename remove_cv<typename remove_reference<D>::type>::type;
-  public:
-    unique_ptr(pointer_type p, conditional<is_reference<D>::value, D, typename add_lvalue_reference<const D>::type> d) : data(p, d) {}
-    unique_ptr(pointer_type p, enable_if<!is_reference<D>::value || is_lvalue_reference<D>::value, A&&> d);
-    unique_ptr(pointer_type p, enable_if<is_lvalue_reference<D>::value, A&> d);
-    unique_ptr(pointer_type p, enable_if<is_lvalue_reference<D>::value, A&&> d);
-    unique_ptr(pointer_type p, enable_if<is_rvalue_reference<D>::value, const A&> d);
-    unique_ptr(pointer_type p, enable_if<is_rvalue_reference<D>::value, const A&&> d);
+    unique_ptr(pointer_type p, conditional<is_reference<deleter_type>::value,
+                                           deleter_type,
+                                           typename add_lvalue_reference<const deleter_type>::type> d) noexcept
+    : data(p, d) {}
+    unique_ptr(pointer_type p, typename remove_reference<deleter_type>::type&& d) noexcept
+    : data(p, move(d))
+    { static_assert(!is_reference<deleter_type>::value, "R-value deleter cannot bind to reference here."); }
 
-    virtual ~unique_ptr() { data.second.operator()(data.first); }
+    // destructor
+    ~unique_ptr() { reset(); }
+
+    // reset
+    void reset(pointer_type p = pointer_type()) noexcept
+    {
+      pointer_type temp = data.first;
+      data.first = p;
+      if(temp != pointer_type())
+        data.second.operator()(temp);
+    }
 
     // no copying from lvalues
     unique_ptr(const unique_ptr&) = delete;
@@ -85,6 +93,15 @@ namespace kiss
   class unique_ptr<T[], D>
   {
   };
+
+/*
+ * make_unique - perfect forwarding and exception safety
+ **/
+  template<typename T, typename... Args>
+  unique_ptr<T> make_unique(Args&&... args)
+  {
+    return unique_ptr<T>(new T(forward<Args>(args)...));
+  }
 
 /*
  * Operator overloads

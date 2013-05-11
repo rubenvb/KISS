@@ -18,18 +18,12 @@
 #ifndef KISS_UTILITY_H
 #define KISS_UTILITY_H
 
+#include "config.h++"
 #include "types.h++"
 
 namespace kiss
 {
-  template<class T> remove_reference<T>&& move(T&&) noexcept;
 
-  template<typename T> constexpr T&&
-  forward(remove_reference<T> t)
-  {
-    static_assert(!kiss::is_lvalue_reference<T>(), "lvalue cannot be converted to rvalue.");
-    return static_cast<T&&>(t);
-  }
 }
 
 #endif

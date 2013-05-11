@@ -18,6 +18,8 @@
 #ifndef KISS_ARRAY_H
 #define KISS_ARRAY_H
 
+#include "config.h++"
+
 namespace kiss
 {
   //T& get(array<T, size>&) noexcept;

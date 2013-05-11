@@ -11,27 +11,15 @@
  ********************************************************************************************/
 
 /*
- * config.h++
- *  Miscellaneous configuration.
+ * test/types/alignment.c++
  **/
 
-#ifndef KISS_CONFIG_H
-#define KISS_CONFIG_H
+#include "types.h++"
 
-#if defined(_MSC_VER) && !defined(__clang__) && !defined(__ICL)
-//#error "this shit is broken anyway"
-#define constexpr const
-#define __alignof__(type) __alignof(type)
-#define alignas(number) __declspec(align(number))
-typedef wchar_t       char16_t;
-typedef unsigned long char32_t;
-#endif
-
-namespace kiss
+int main()
 {
-  constexpr int major_version = 0;
-  constexpr int minor_version = 1;
-  constexpr int version = major_version*100+minor_version;
-}
+//TODO alignment_of
 
-#endif
+//TODO aligned_storage
+
+}

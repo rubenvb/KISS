@@ -23,6 +23,7 @@
 #ifndef KISS_TUPLE_H
 #define KISS_TUPLE_H
 
+#include "config.h++"
 #include "types.h++"
 
 namespace kiss

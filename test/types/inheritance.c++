@@ -1,15 +1,22 @@
 /**
- * This file is dual licensed under the MIT and the University of Illinois Open
- * Source Licenses. See LICENSE.TXT for details.
+ * Written in 2013 by Ruben Van Boxem <vanboxem.ruben@gmail.com>
+ *
+ * To the extent possible under law, the author(s) have dedicated all copyright and related
+ * and neighboring rights to this software to the public domain worldwide. This software is
+ * distributed without any warranty.
+ *
+ * You should have received a copy of the CC0 Public Domain Dedication along with this software.
+ * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  *
  ********************************************************************************************/
 
- /*
-  * types/transforming_traits.c++
-  *  Transforming traits tests.
-  */
+/*
+ * test/types/inheritance.c++
+ **/
 
-#include <types.h++>
+#include "types.h++"
+
+#include "../test.h++"
 
 using namespace kiss;
 
@@ -34,9 +41,9 @@ struct PrivateChild : private Child, private OtherChild {};
 
 int main()
 {
-  // underlying_type
-  // has_virtual_destructor
-  // is_base_of
+//TODO underlying_type
+//TODO has_virtual_destructor
+//TODO is_base_of
   test_is_base_of<Struct, PrivateChild>();
   test_is_base_of<Child, PrivateChild>();
   test_is_base_of<OtherChild, PrivateChild>();
@@ -48,7 +55,7 @@ int main()
   test_is_not_base_of<Struct&, PrivateChild&>();
   test_is_not_base_of<Struct[3], PrivateChild[3]>();
   test_is_not_base_of<int, int>();
-  // is_empty
-  // is_polymorphic
-  // is_abstract
+//TODO is_empty
+//TODO is_polymorphic
+//TODO is_abstract
 }

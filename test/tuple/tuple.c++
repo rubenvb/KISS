@@ -11,27 +11,14 @@
  ********************************************************************************************/
 
 /*
- * config.h++
- *  Miscellaneous configuration.
+ * test/tuple/tuple.c++
  **/
 
-#ifndef KISS_CONFIG_H
-#define KISS_CONFIG_H
+#include "tuple.h++"
 
-#if defined(_MSC_VER) && !defined(__clang__) && !defined(__ICL)
-//#error "this shit is broken anyway"
-#define constexpr const
-#define __alignof__(type) __alignof(type)
-#define alignas(number) __declspec(align(number))
-typedef wchar_t       char16_t;
-typedef unsigned long char32_t;
-#endif
+using namespace kiss;
 
-namespace kiss
+int main()
 {
-  constexpr int major_version = 0;
-  constexpr int minor_version = 1;
-  constexpr int version = major_version*100+minor_version;
+  static_assert(false, "unimplemented");
 }
-
-#endif

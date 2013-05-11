@@ -17,7 +17,7 @@
 #ifndef KISS_PAIR_H
 #define KISS_PAIR_H
 
-#include "tmp.h++"
+#include "config.h++"
 #include "types.h++"
 
 namespace kiss
@@ -38,7 +38,7 @@ namespace kiss
     template<typename T> struct empty_first_base
     {
       static T first;
-      constexpr empty_first_base(const T& f) {}
+      constexpr empty_first_base(const T&) {}
       template<typename U>
       constexpr empty_first_base(U&&) {}
     };

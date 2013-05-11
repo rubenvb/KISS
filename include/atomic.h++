@@ -18,6 +18,8 @@
 #ifndef KISS_ATOMIC_H
 #define KISS_ATOMIC_H
 
+#include "config.h++"
+
 namespace kiss
 {
   namespace atomic

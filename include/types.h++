@@ -49,9 +49,7 @@ namespace kiss
   using char16 = char16_t;
   using char32 = char32_t;
 
-/*
- * integral_constant, true_type, false_type
- **/
+  // integral_constant
   template<typename T, T valueT>
   struct integral_constant
   {
@@ -59,13 +57,21 @@ namespace kiss
     using type = integral_constant<T,value>;
     constexpr operator T() { return value; }
   };
-  // true_type/false_type
+  // true_type
   using true_type = integral_constant<bool, true>;
+  // false_type
   using false_type = integral_constant<bool, false>;
 
 /*
- * reference-pointer transformations
+ * references
  **/
+  // is_lvalue_reference
+  template<typename> struct is_lvalue_reference : false_type {};
+  template<typename T> struct is_lvalue_reference<T&> : true_type {};
+  // is_rvalue_reference
+  template<typename> struct is_rvalue_reference : false_type {};
+  template<typename T> struct is_rvalue_reference<T&&> : true_type {};
+
   // add_lvalue_reference
   template<typename T> struct add_lvalue_reference { using type = T&; };
   template<> struct add_lvalue_reference<void> { using type = void; };
@@ -84,15 +90,67 @@ namespace kiss
   template <typename T> struct remove_reference<T&>  { using type = T; };
   template <typename T> struct remove_reference<T&&> { using type = T; };
 
+/*
+ * pointers
+ **/
   // add_pointer
   template<typename T> struct add_pointer { using type = typename remove_reference<T>::type*; };
 
   // remove_pointer
   template<typename T> struct remove_pointer { using type = T; };
   template<typename T> struct remove_pointer<T*> { using type = T; };
+  template<typename T> struct remove_pointer<T* const> { using type = T; };
+  template<typename T> struct remove_pointer<T* volatile> { using type = T; };
+  template<typename T> struct remove_pointer<T* const volatile> { using type = T; };
 
 /*
- * const-volatile identification
+ * Utility
+ **/
+
+  // conditional
+  namespace implementation
+  {
+    template<bool, typename First, typename Second> struct conditional { using type = First; };
+    template<typename First, typename Second> struct conditional<false, First, Second> { using type = Second; };
+  }
+  template<bool B, typename First, typename Second> using conditional = typename implementation::conditional<B, First, Second>::type;
+
+  // declval
+  template<typename T> typename add_rvalue_reference<T>::type declval() noexcept;
+
+  // enable_if
+  namespace implementation
+  {
+    template<bool, typename T = void> struct enable_if {};
+    template<typename T> struct enable_if<true, T> { using type = T; };
+  }
+  template<bool Condition, typename T = void> using enable_if = typename implementation::enable_if<Condition, T>::type;
+
+  // forward
+  template<typename T>
+  inline constexpr T&& forward(typename remove_reference<T>::type& t) noexcept
+  { return static_cast<T&&>(t); }
+  template<typename T>
+  inline constexpr T&& forward(typename remove_reference<T>::type&& t) noexcept
+  {
+    static_assert(!is_lvalue_reference<T>::value, "An rvalue cannot be forwarded as an lvalue.");
+    return static_cast<T&&>(t);
+  }
+
+  // identity
+  template<typename T> using identity = T;
+
+  // is_same
+  template<typename, typename> struct is_same : false_type {};
+  template<typename T> struct is_same<T,T> : true_type {};
+
+  // move
+  template<typename T>
+  inline constexpr typename remove_reference<T>::type&& move(T&& t) noexcept
+  { return static_cast<typename remove_reference<T>::type&&>(t); }
+
+/*
+ * const-volatile
  **/
   // is_const
   template<typename> struct is_const : false_type {};
@@ -101,9 +159,6 @@ namespace kiss
   template<typename T> struct is_volatile : false_type {};
   template<typename T> struct is_volatile<T volatile> : true_type {};
 
-/*
- * const-volatile transformations
- **/
   // add_const
   template<typename T> struct add_const { using type = const T; };
   // add_volatile
@@ -121,96 +176,7 @@ namespace kiss
   template<typename T> struct remove_cv { using type = typename remove_volatile<typename remove_const<T>::type>::type; };
 
 /*
- * Miscellaneous
- **/
-  // addressof
-  template<typename T> T* addressof(T& arg)
-  { return reinterpret_cast<T*>(&const_cast<char&>(reinterpret_cast<const volatile char&>(arg))); }
-  // conditional
-  namespace implementation
-  {
-    template<bool, typename First, typename Second> struct conditional { using type = First; };
-    template<typename First, typename Second> struct conditional<false, First, Second> { using type = Second; };
-  }
-  template<bool B, typename First, typename Second> using conditional = typename implementation::conditional<B, First, Second>::type;
-  // declval
-  template<typename T> typename add_rvalue_reference<T>::type declval() noexcept;
-  // common_type
-  template<typename ...T> struct common_type;
-  template<typename T> struct common_type<T> { using type = T; };
-  template<typename T, typename U> struct common_type<T, U> { using type = decltype(true ? declval<T>() : declval<U>()); };
-  template<typename T, typename U, typename... V> struct common_type<T, U, V...> { using type = typename common_type<typename common_type<T, U>::type, V...>::type; };
-//TODO result_of
-  template<typename> struct result_of;
-  template<> struct result_of<void> { using type = void; };
-  template<typename T, typename Class, typename Thing>
-  struct result_of<T Class::*(Thing)> { using type = conditional<is_const<typename remove_pointer<Thing>::type>::value,
-                                                                 typename add_lvalue_reference<typename add_const<T>::type>::type, typename add_rvalue_reference<T>::type>; };
-  // this is useless :(
-  //template<typename T, typename Class, typename... ArgTypes>
-  //struct result_of<T (Class::*)(ArgTypes...)> { using type = T; };
-  template<typename T, typename Class, typename... ArgTypes>
-  struct result_of<T Class::*(ArgTypes...)> { using type = void; }; // WRONG
-  template<typename T, typename Class, typename... ArgTypes>
-  struct result_of<T const Class::*(ArgTypes...)> { using type = T; };
-  template<typename Function, typename... ArgTypes>
-  struct result_of<Function(ArgTypes...)> { using type = decltype(declval<typename remove_cv<typename remove_reference<Function>::type>::type>()(declval<ArgTypes>()...)); };
-  // is_same
-  template<typename, typename> struct is_same : false_type {};
-  template<typename T> struct is_same<T,T> : true_type {};
-
-/*
- * KISS traits - useful but not present in C++11
- **/
-  // is_convertible
-  template<typename From, typename To>
-  struct is_convertible
-  {
-  private:
-    static void foo(To);
-    template<typename F>
-    static auto test(int) -> decltype(foo(declval<F>()), void(), true_type{});
-    template<typename>
-    static auto test(...) -> false_type;
-  public:
-    static constexpr bool value = decltype(test<From>(0))::value;
-    constexpr operator bool() { return value; }
-  };
-  // is_complete
-  template<typename T, typename... Ts>
-  struct is_complete
-  {
-  private:
-    template<unsigned...> static constexpr void foo();
-    template<typename... Us>
-    static auto test(int) -> decltype(foo<sizeof(Us)...>(), void(), true_type{});
-    template<typename...>
-    static auto test(...) -> false_type;
-  public:
-    static constexpr bool value = decltype(test<T, Ts...>(0))::value;
-    constexpr operator bool() { return value; }
-  };
-
-//TODO is_polymorphic_functor
-  //    template<typename T>
-  //    struct is_polymorphic_functor
-  //    {
-  //    private:
-  //      template<typename U, typename V>
-  //      static auto test(U *u, V* v) -> decltype((*u)(*v), void(), false_type); // error here
-  //      template<typename>
-  //      static auto test(...) -> true_type;
-  //      struct foo {};
-  //    public:
-  //      static const bool value = decltype(test((T*)nullptr))::value;
-  //    };
-
-  // is_nullptr
-  template<typename> struct is_nullptr : false_type {};
-  template<> struct is_nullptr<nullptr_type> : true_type {};
-
-/*
- * Primary type categories
+ * Primary categories
  **/
   // is_void
   namespace implementation
@@ -264,40 +230,37 @@ namespace kiss
     template<typename T> struct is_pointer<T*> : true_type {};
   }
   template<typename T> struct is_pointer : implementation::is_pointer<typename remove_cv<T>::type> {};
-  // is_lvalue_reference
-  template<typename> struct is_lvalue_reference : false_type {};
-  template<typename T> struct is_lvalue_reference<T&> : true_type {};
-  // is_rvalue_reference
-  template<typename> struct is_rvalue_reference : false_type {};
-  template<typename T> struct is_rvalue_reference<T&&> : true_type {};
 //TODO INTRINSIC is_enum
   template<typename T> struct is_enum : integral_constant<bool, __is_enum(typename remove_cv<T>::type)> {};
-//TODO INTRINSIC is_union
+ //TODO INTRINSIC is_union
   template<typename T> struct is_union : integral_constant<bool, __is_union(typename remove_cv<T>::type)> {};
 //TODO INTRINSIC is_class
   template<typename T> struct is_class : integral_constant<bool, __is_class(typename remove_cv<T>::type)> {};
   // is_function
-  namespace implementation
-  {
-    template<typename T> struct is_function : integral_constant<bool, !is_convertible<T*, const volatile void*>()> {};
-    template<typename T> struct is_function<T&> : false_type {};
-    template<typename T> struct is_function<T&&> : false_type {};
-  }
-  template<typename T> struct is_function : implementation::is_function<typename remove_cv<T>::type> {};
-  // is_member_object_pointer
-  namespace implementation
-  {
-    template<typename> struct is_member_object_pointer : false_type {};
-    template<typename T, typename Class> struct is_member_object_pointer<T Class::*> : integral_constant<bool, !is_function<T>()> {};
-  }
-  template<typename T> struct is_member_object_pointer : implementation::is_member_object_pointer<typename remove_reference<T>::type> {};
+  template<typename> struct is_function : public false_type { };
+  template<typename Result, typename... ArgTypes> struct is_function<Result(ArgTypes...)> : public true_type { };
+  template<typename Result, typename... ArgTypes> struct is_function<Result(ArgTypes..., ...)> : public true_type { };
   // is_member_function_pointer
   namespace implementation
   {
     template<typename> struct is_member_function_pointer : false_type {};
-    template <typename T, typename Class> struct is_member_function_pointer<T Class::*> : is_function<T> {};
+    template <typename T, typename Class> struct is_member_function_pointer<T Class::*> : is_function<typename remove_cv<T>::type> {};
   }
   template<typename T> struct is_member_function_pointer : implementation::is_member_function_pointer<typename remove_reference<T>::type> {};
+  // is_member_object_pointer
+  namespace implementation
+  {
+    template<typename> struct is_member_object_pointer : false_type {};
+    template<typename T, typename Class> struct is_member_object_pointer<T Class::*> : integral_constant<bool, !is_function<T>::value> {};
+  }
+  template<typename T> struct is_member_object_pointer : implementation::is_member_object_pointer<typename remove_cv<T>::type> {};
+  // is_nullptr
+  namespace implementation
+  {
+    template<typename> struct is_nullptr : false_type {};
+    template<> struct is_nullptr<nullptr_type> : true_type {};
+  }
+  template<typename T> struct is_nullptr : implementation::is_nullptr<typename remove_cv<T>::type> {};
 
 /*
  * Composite type categories
@@ -309,13 +272,127 @@ namespace kiss
   // is_fundamental
   template<typename T> struct is_fundamental : integral_constant<bool, is_void<T>() || is_nullptr<T>() || is_arithmetic<T>()> {};
   // is_member_pointer
-  template<typename T> struct is_member_pointer : integral_constant<bool, is_member_function_pointer<T>() || is_member_object_pointer<T>()> {};
+  namespace implementation
+  {
+    template<typename> struct is_member_pointer : false_type {};
+    template<typename T, typename Class> struct is_member_pointer<T Class::*> : true_type {};
+  }
+  template<typename T> struct is_member_pointer : implementation::is_member_pointer<typename remove_cv<T>::type> {};
   // is_scalar
-  template<typename T> struct is_scalar : integral_constant<bool, is_pointer<T>() || is_arithmetic<T>() || is_enum<T>() || is_member_pointer<T>()> {};
+  template<typename T> struct is_scalar : integral_constant<bool, is_pointer<T>() || is_nullptr<T>() || is_arithmetic<T>() || is_enum<T>() || is_member_pointer<T>()> {};
   // is_object
   template<typename T> struct is_object : integral_constant<bool, is_scalar<T>() || is_c_array<T>() || is_union<T>() || is_class<T>()> {};
   // is_compund
   template<typename T> struct is_compound : integral_constant<bool, !is_fundamental<T>()> {};
+
+/*
+ * Miscellaneous
+ **/
+  // addressof
+  template<typename T> T* addressof(T& arg)
+  { return reinterpret_cast<T*>(&const_cast<char&>(reinterpret_cast<const volatile char&>(arg))); }
+
+  // common_type
+  template<typename ...T> struct common_type;
+  template<typename T> struct common_type<T> { using type = T; };
+  template<typename T, typename U> struct common_type<T, U> { using type = decltype(true ? declval<T>() : declval<U>()); };
+  template<typename T, typename U, typename... V> struct common_type<T, U, V...> { using type = typename common_type<typename common_type<T, U>::type, V...>::type; };
+
+  // is_convertible
+  namespace implementation
+  {
+    template<typename From, typename To> struct is_convertible;
+    template<> struct is_convertible<void, void> : true_type {};
+    template<typename To> struct is_convertible<void, To> : false_type {};
+    template<typename From> struct is_convertible<From, void> : false_type {};
+    template<typename From, typename To>
+    struct is_convertible
+    {
+    private:
+      static void foo(To);
+      template<typename F>
+      static auto test(int) -> decltype(foo(declval<F>()), void(), true_type{});
+      template<typename>
+      static auto test(...) -> false_type;
+    public:
+      static constexpr bool value = decltype(test<From>(0))::value;
+      constexpr operator bool() { return value; }
+    };
+  }
+  template<typename From, typename To> struct is_convertible : implementation::is_convertible<From, To> {};
+  /*template<typename From, typename To> struct is_convertible : conditional<is_void<From>::value || is_void<To>::value,
+                                                                           conditional<is_void<To>::value && is_void<From>::value,
+                                                                                       true_type,
+                                                                                       false_type>,
+                                                                           implementation::is_convertible<From, To>> {};*/
+  /*template<> struct is_convertible<void, void> : true_type {};
+  template<> struct is_convertible<void, const void> : true_type {};
+  template<> struct is_convertible<void, volatile void> : true_type {};
+  template<> struct is_convertible<void, const volatile void> : true_type {};
+  template<> struct is_convertible<const void, void> : true_type {};
+  template<> struct is_convertible<const void, const void> : true_type {};
+  template<> struct is_convertible<const void, volatile void> : true_type {};
+  template<> struct is_convertible<const void, const volatile void> : true_type {};
+  template<> struct is_convertible<const volatile void, void> : true_type {};
+  template<> struct is_convertible<const volatile void, const void> : true_type {};
+  template<> struct is_convertible<const volatile void, volatile void> : true_type {};
+  template<> struct is_convertible<const volatile void, const volatile void> : true_type {};
+  template<typename T> struct is_convertible<void, T> : false_type {};
+  template<typename T> struct is_convertible<const void, T> : false_type {};
+  template<typename T> struct is_convertible<volatile void, T> : false_type {};
+  template<typename T> struct is_convertible<const volatile void, T> : false_type {};*/
+  /*template<typename T> struct is_convertible<T, void> : false_type {};
+  template<typename T> struct is_convertible<T, const void> : false_type {};
+  template<typename T> struct is_convertible<T, volatile void> : false_type {};
+  template<typename T> struct is_convertible<T, const volatile void> : false_type {};*/
+
+  //template<typename T> struct is_convertible<Array[], Array[]> : false_type{};
+  template<typename T, size_type N> struct is_convertible<T[N], T[N]> : false_type{}; // !is_convertible<Array, Array>
+
+  // is_complete
+  template<typename T, typename... Ts>
+  struct is_complete
+  {
+  private:
+    template<unsigned...> static constexpr void foo();
+    template<typename... Us>
+    static auto test(int) -> decltype(foo<sizeof(Us)...>(), void(), true_type{});
+    template<typename...>
+    static auto test(...) -> false_type;
+  public:
+    static constexpr bool value = decltype(test<T, Ts...>(0))::value;
+    constexpr operator bool() { return value; }
+  };
+
+//TODO is_polymorphic_functor
+  //    template<typename T>
+  //    struct is_polymorphic_functor
+  //    {
+  //    private:
+  //      template<typename U, typename V>
+  //      static auto test(U *u, V* v) -> decltype((*u)(*v), void(), false_type); // error here
+  //      template<typename>
+  //      static auto test(...) -> true_type;
+  //      struct foo {};
+  //    public:
+  //      static const bool value = decltype(test((T*)nullptr))::value;
+  //    };
+
+//TODO result_of
+  template<typename> struct result_of;
+  template<typename F, typename... ArgTypes>
+  struct result_of<F(ArgTypes...)> { using type = decltype(declval<F>()(declval<ArgTypes>()...)); };
+  //template<typename> struct result_of;
+  //template<typename T> struct result_of<T> { using type = T; };
+  //template<typename T, typename Class, typename Thing>
+  //struct result_of<T Class::*(Thing)> { using type = conditional<is_const<typename remove_pointer<Thing>::type>::value,
+  //                                                               typename add_lvalue_reference<typename add_const<T>::type>::type, typename add_rvalue_reference<T>::type>; };
+  //template<typename T, typename Class, typename... ArgTypes>
+  //struct result_of<T Class::*(ArgTypes...)> { using type = void; }; // WRONG
+  //template<typename T, typename Class, typename... ArgTypes>
+  //struct result_of<T const Class::*(ArgTypes...)> { using type = T; };
+  //template<typename Function, typename... ArgTypes>
+  //struct result_of<Function(ArgTypes...)> { using type = decltype(declval<typename remove_cv<typename remove_reference<Function>::type>::type>()(declval<ArgTypes>()...)); };
 
 /*
  * Signedness
@@ -377,6 +454,7 @@ namespace kiss
   template<typename T> struct remove_all_extents { using type = T; };
   template<typename T> struct remove_all_extents<T[]> { using type = typename remove_all_extents<T>::type; };
   template<typename T, size_type N> struct remove_all_extents<T[N]> { using type = typename remove_all_extents<T>::type; };
+
   // decay
   template <class T>
   struct decay
@@ -431,7 +509,7 @@ namespace kiss
 
     constexpr operator bool() { return decltype(test<T>(0))::value; }
   };*/
-// is_copy_constructible
+  // is_copy_constructible
   template<typename T> struct is_copy_constructible : is_convertible<T,T> {};
 //TODO is_move_constructible
   template<typename T> struct is_move_constructible
@@ -537,28 +615,7 @@ namespace kiss
 //TODO aligned_storage - needs default argument
   template<size_type size, size_type alignment>
   struct aligned_storage
-  {
-    using type = struct { alignas(alignment) unsigned char data[size]; };
-  };
-
-/*
- * Other stuff
- **/
-  // move
-  template<typename T>
-  inline constexpr typename remove_reference<T>::type&&
-  move(T&& t) noexcept
-  { return static_cast<typename remove_reference<T>::type&&>(t); }
-  // forward
-  template<typename T>
-  inline constexpr T&& forward(typename remove_reference<T>::type& t) noexcept
-  { return static_cast<T&&>(t); }
-  template<typename T>
-  inline constexpr T&& forward(typename remove_reference<T>::type&& t) noexcept
-  {
-    static_assert(!is_lvalue_reference<T>::value, "An rvalue cannot be forwarded as an lvalue.");
-    return static_cast<T&&>(t);
-  }
+  { using type = struct { alignas(alignment) unsigned char data[size]; }; };
 }
 
 /*

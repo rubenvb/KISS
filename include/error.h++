@@ -19,6 +19,8 @@
 #ifndef KISS_ERROR_H
 #define KISS_ERROR_H
 
+#include "config.h++"
+
 namespace kiss {
   class error;
 
