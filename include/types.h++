@@ -613,7 +613,7 @@ namespace kiss
   }
   template<typename T> struct member_alignment_of : integral_constant<size_type, alignof(implementation::member<T>)> {};
 //TODO aligned_storage - needs default argument
-  template<size_type size, size_type alignment>
+  template<size_type size, size_type alignment = member_alignment_of<long double>::value>
   struct aligned_storage
   { using type = struct { alignas(alignment) unsigned char data[size]; }; };
 }
@@ -649,6 +649,10 @@ namespace std
   { return il.begin(); }
   template<typename E> const E* end(initializer_list<E> il)
   { return il.end(); }
+}
+namespace kiss
+{
+  template<typename T> using initializer_list = std::initializer_list<T>;
 }
 #endif
 

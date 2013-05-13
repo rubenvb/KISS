@@ -34,28 +34,68 @@ void test_is_not_base_of()
     static_assert(!is_base_of<T, U>(), "");
 }
 
-struct Struct {};
-struct Child : Struct {};
-struct OtherChild : Struct {};
-struct PrivateChild : private Child, private OtherChild {};
-
 int main()
 {
 //TODO underlying_type
 //TODO has_virtual_destructor
-//TODO is_base_of
-  test_is_base_of<Struct, PrivateChild>();
-  test_is_base_of<Child, PrivateChild>();
-  test_is_base_of<OtherChild, PrivateChild>();
-  test_is_base_of<Struct, Child>();
-  test_is_base_of<Struct, OtherChild>();
-  test_is_base_of<Struct, Struct>();
+  // is_base_of
+  test_binary_trait_cv<is_base_of, Class, PrivateChild>();
+  test_binary_trait_cv<is_base_of, Child, PrivateChild>();
+  test_binary_trait_cv<is_base_of, Class, Child>();
+  test_binary_trait_cv<is_base_of, Class, OtherChild>();
+  test_binary_trait_cv<is_base_of, Class, Class>();
 
-  test_is_not_base_of<PrivateChild, Child>();
-  test_is_not_base_of<Struct&, PrivateChild&>();
-  test_is_not_base_of<Struct[3], PrivateChild[3]>();
-  test_is_not_base_of<int, int>();
-//TODO is_empty
-//TODO is_polymorphic
-//TODO is_abstract
+  test_binary_trait_cv<is_base_of, OtherChild, PrivateChild, false>();
+  test_binary_trait_cv<is_base_of, PrivateChild, Child, false>();
+  test_binary_trait_cv<is_base_of, Class&, PrivateChild&, false>();
+  test_binary_trait_cv<is_base_of, Class[3], PrivateChild[3], false>();
+  test_binary_trait_cv<is_base_of, int, int, false>();
+
+  // is_empty
+  test_unary_trait_cv<is_empty, void, false>();
+  test_unary_trait_cv<is_empty, int&, false>();
+  test_unary_trait_cv<is_empty, int, false>();
+  test_unary_trait_cv<is_empty, double, false>();
+  test_unary_trait_cv<is_empty, int*, false>();
+  test_unary_trait_cv<is_empty, const int*, false>();
+  test_unary_trait_cv<is_empty, char[3], false>();
+  test_unary_trait_cv<is_empty, char[3], false>();
+  test_unary_trait_cv<is_empty, Union, false>();
+  test_unary_trait_cv<is_empty, NotEmptyClass, false>();
+
+  test_unary_trait_cv<is_empty, EmptyClass>();
+  test_unary_trait_cv<is_empty, ZeroBit>();
+
+  // is_polymorphic
+  test_unary_trait_cv<is_polymorphic, void, false>();
+  test_unary_trait_cv<is_polymorphic, int&, false>();
+  test_unary_trait_cv<is_polymorphic, int, false>();
+  test_unary_trait_cv<is_polymorphic, double, false>();
+  test_unary_trait_cv<is_polymorphic, int*, false>();
+  test_unary_trait_cv<is_polymorphic, const int*, false>();
+  test_unary_trait_cv<is_polymorphic, char[3], false>();
+  test_unary_trait_cv<is_polymorphic, char[3], false>();
+  test_unary_trait_cv<is_polymorphic, Union, false>();
+  test_unary_trait_cv<is_polymorphic, EmptyClass, false>();
+  test_unary_trait_cv<is_polymorphic, ZeroBit, false>();
+  test_unary_trait_cv<is_polymorphic, Final, false>();
+  test_unary_trait_cv<is_polymorphic, NotEmptyClass&, false>();
+  test_unary_trait_cv<is_polymorphic, AbstractClass&, false>();
+  test_unary_trait_cv<is_polymorphic, NotEmptyClass>();
+  test_unary_trait_cv<is_polymorphic, AbstractClass>();
+
+  // is_abstract
+  test_unary_trait_cv<is_abstract, void, false>();
+  test_unary_trait_cv<is_abstract, int&, false>();
+  test_unary_trait_cv<is_abstract, int, false>();
+  test_unary_trait_cv<is_abstract, double, false>();
+  test_unary_trait_cv<is_abstract, int*, false>();
+  test_unary_trait_cv<is_abstract, const int*, false>();
+  test_unary_trait_cv<is_abstract, char[3], false>();
+  test_unary_trait_cv<is_abstract, char[3], false>();
+  test_unary_trait_cv<is_abstract, Union, false>();
+  test_unary_trait_cv<is_abstract, EmptyClass, false>();
+  test_unary_trait_cv<is_abstract, ZeroBit, false>();
+  test_unary_trait_cv<is_abstract, NotEmptyClass, false>();
+  test_unary_trait_cv<is_abstract, AbstractClass>();
 }
