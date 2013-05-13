@@ -21,5 +21,6 @@ ctest
 
 Current progress:
  - math.h++ contains C math functions wrapped in overloaded functions for each relevant type.
+ - pair.h++ contains a compressed pair implementation that uses the Empty Base Class optimization for empty types.
  - types.h++ contains most type traits, but most lack tests so the untested ones may be wrong.
     The libc++ test suite is being used as a base to test these.
