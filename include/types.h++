@@ -472,15 +472,15 @@ namespace kiss
 /*
  * Memory properties
  **/
-//TODO is_literal
-  template<typename T> struct is_literal_type : false_type {};
-  // is_pod
+//TODO INTRINSIC is_literal_type
+  template<typename T> struct is_literal_type : integral_constant<bool, __is_literal_type(T)> {};
+//TODO INTRINSIC is_pod
   template<typename T> struct is_pod : integral_constant<bool, __is_pod(T)> {};
-  // is_trivial
+//TODO INTRINSIC is_trivial
   template<typename T> struct is_trivial : integral_constant<bool, __is_trivial(T)> {};
-  // is_trivially_copyable
-  template<typename T> struct is_trivially_copyable : integral_constant<bool, __has_trivial_copy(T)> {};
-  // is_standard_layout
+//TODO INTRINSIC is_trivially_copyable
+  template<typename T> struct is_trivially_copyable : integral_constant<bool, __is_trivially_copyable(T)> {};
+//TODO INTRINSIC is_standard_layout
   template<typename T> struct is_standard_layout : integral_constant<bool, __is_standard_layout(T)> {};
 
 /*
@@ -536,13 +536,13 @@ namespace kiss
   { static_assert(is_complete<T>(), "is_move_assignable can only be used with a complete type"); };
 
 //TODO is_trivially_constructible
-  template<typename> struct is_trivially_constructible : false_type {};
+  template<typename T, typename... ArgTypes> struct is_trivially_constructible : integral_constant<bool, __is_trivially_constructible(T, ArgTypes...)> {};
 //TODO is_trivially_default_constructible
-  template<typename> struct is_trivially_default_constructible : false_type {};
+  template<typename T> struct is_trivially_default_constructible : is_trivially_constructible<T> {};
 //TODO is_trivially_copy_constructible
-  template<typename> struct is_trivially_copy_constructible : false_type {};
+  template<typename T> struct is_trivially_copy_constructible :  is_trivially_constructible<T, const typename add_lvalue_reference<T>::type> {};
 //TODO is_trivially_move_constructible
-  template<typename> struct is_trivially_move_constructible : false_type {};
+  template<typename T> struct is_trivially_move_constructible : is_trivially_constructible<T, const typename add_rvalue_reference<T>::type> {};
 
 //TODO is_trivially_assignable
   template<typename> struct is_trivially_assignable : false_type {};

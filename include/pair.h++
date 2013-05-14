@@ -155,9 +155,9 @@ namespace kiss
   { return !(y<x); }
 
   // make_pair
-  //template<typename T1, typename T2>
-  //pair<V1, V2> make_pair(T1&& x, T2&& y)
-  //{ return pair<V1, V2>(forward<T1>(x), forward<T2>(y)); }
+  template<typename T1, typename T2, typename V1, typename V2>
+  pair<V1, V2> make_pair(T1&& x, T2&& y)
+  { return pair<V1, V2>(forward<T1>(x), forward<T2>(y)); }
 }
 
 #endif

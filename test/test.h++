@@ -37,7 +37,9 @@ using FunctionPtr = void(*)();
 using Function1 = void(int);
 using Function2 = void(int, double);
 class IncompleteClass;
-class NotEmptyClass { virtual ~NotEmptyClass(); };
+class NotEmptyClass { int i; };
+class TriviallyCopyableClass { TriviallyCopyableClass(); };
+class VirtuallyDestructibleClass { int i; virtual ~VirtuallyDestructibleClass() { i=42; } };
 union Union {};
 struct ZeroBit { int : 0; };
 

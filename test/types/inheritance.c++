@@ -20,24 +20,34 @@
 
 using namespace kiss;
 
-template <class T, class U>
-void test_is_base_of()
-{
-    static_assert(is_base_of<T, U>(), "");
-    static_assert(is_base_of<const T, U>(), "");
-    static_assert(is_base_of<T, const U>(), "");
-    static_assert(is_base_of<const T, const U>(), "");
-}
-template <class T, class U>
-void test_is_not_base_of()
-{
-    static_assert(!is_base_of<T, U>(), "");
-}
-
 int main()
 {
-//TODO underlying_type
-//TODO has_virtual_destructor
+  // underlying_type
+  enum E : int {};
+  enum F : unsigned {};
+  enum G : char {};
+
+  test_nested_type_trait_cv<underlying_type, E, int>();
+  test_nested_type_trait_cv<underlying_type, F, unsigned>();
+  test_nested_type_trait_cv<underlying_type, G, char>();
+
+  // has_virtual_destructor
+  test_unary_trait<has_virtual_destructor, void, false>();
+  test_unary_trait<has_virtual_destructor, Class, false>();
+  test_unary_trait<has_virtual_destructor, int&, false>();
+  test_unary_trait<has_virtual_destructor, Union, false>();
+  test_unary_trait<has_virtual_destructor, EmptyClass, false>();
+  test_unary_trait<has_virtual_destructor, int, false>();
+  test_unary_trait<has_virtual_destructor, double, false>();
+  test_unary_trait<has_virtual_destructor, int*, false>();
+  test_unary_trait<has_virtual_destructor, const int*, false>();
+  test_unary_trait<has_virtual_destructor, char[3], false>();
+  test_unary_trait<has_virtual_destructor, char[3], false>();
+  test_unary_trait<has_virtual_destructor, ZeroBit, false>();
+
+  test_unary_trait<has_virtual_destructor, AbstractClass>();
+  test_unary_trait<has_virtual_destructor, NotEmptyClass>();
+
   // is_base_of
   test_binary_trait_cv<is_base_of, Class, PrivateChild>();
   test_binary_trait_cv<is_base_of, Child, PrivateChild>();
