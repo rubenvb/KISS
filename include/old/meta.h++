@@ -10,9 +10,20 @@
  *
  ********************************************************************************************/
 
- /*
-  * algorithm.cxx
-  *  KISS algorithms implementation.
-  */
+/*
+ * utility.h++
+ *  Utility functions.
+ **/
 
+#ifndef KISS_META_H
+#define KISS_META_H
 
+#include "config.h++"
+#include "types.h++"
+
+namespace kiss
+{
+
+}
+
+#endif

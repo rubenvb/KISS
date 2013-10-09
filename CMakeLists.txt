@@ -18,7 +18,7 @@ project(KISS)
 if(CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CXX_FLAGS "-std=c++11 -pedantic-errors -Wextra -Wconversion -Wuninitialized -Winit-self -Wmissing-include-dirs -Wstrict-aliasing -Werror ${CMAKE_CXX_FLAGS}")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-set(CMAKE_CXX_FLAGS "-std=c++11 -pedantic-errors -Wextra -Wconversion -Wuninitialized -Winit-self -Wmissing-include-dirs -Wstrict-aliasing -Werror ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 -pedantic-errors -Wextra -Wconversion -Wuninitialized -Winit-self -Wmissing-include-dirs -Wstrict-aliasing -Werror -Wno-constexpr-not-const ${CMAKE_CXX_FLAGS}")
 endif()
 
 # Library
@@ -59,8 +59,8 @@ compile_test(types construction_destruction_assignment_copy_move)
 compile_test(types inheritance)
 compile_test(types alignment)
 
-runtime_test(pair       pair)
+runtime_test(utility compressed_pair)
 
-runtime_test(tuple      tuple)
+runtime_test(utility tuple)
 
-runtime_test(unique_ptr unique_ptr)
+runtime_test(smart_pointers unique_ptr)

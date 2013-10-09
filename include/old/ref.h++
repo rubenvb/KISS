@@ -20,7 +20,6 @@
 #define KISS_REF_H
 
 #include "config.h++"
-#include "tmp.h++"
 #include "types.h++"
 
 namespace kiss

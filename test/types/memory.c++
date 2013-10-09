@@ -15,7 +15,7 @@
  **/
 
 #include "types.h++"
-#include "pair.h++"
+//#include "pair.h++"
 
 #include "../test.h++"
 
@@ -63,5 +63,5 @@ int main()
   test_unary_trait_cv<is_standard_layout, int[3]>();
   test_unary_trait_cv<is_standard_layout, int&, false>();
   test_unary_trait_cv<is_standard_layout, volatile int&, false>();
-  test_unary_trait_cv<is_standard_layout, pair<int, double>>();
+  //test_unary_trait_cv<is_standard_layout, pair<int, double>>();
 }

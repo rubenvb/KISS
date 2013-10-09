@@ -479,7 +479,8 @@ namespace kiss
 //TODO INTRINSIC is_trivial
   template<typename T> struct is_trivial : integral_constant<bool, __is_trivial(T)> {};
 //TODO INTRINSIC is_trivially_copyable
-  template<typename T> struct is_trivially_copyable : integral_constant<bool, __is_trivially_copyable(T)> {};
+  // not in GCC 4.8.1
+  //template<typename T> struct is_trivially_copyable : integral_constant<bool, __is_trivially_copyable(T)> {};
 //TODO INTRINSIC is_standard_layout
   template<typename T> struct is_standard_layout : integral_constant<bool, __is_standard_layout(T)> {};
 
@@ -536,13 +537,14 @@ namespace kiss
   { static_assert(is_complete<T>(), "is_move_assignable can only be used with a complete type"); };
 
 //TODO is_trivially_constructible
-  template<typename T, typename... ArgTypes> struct is_trivially_constructible : integral_constant<bool, __is_trivially_constructible(T, ArgTypes...)> {};
+  // not in GCC 4.8.1
+  //template<typename T, typename... ArgTypes> struct is_trivially_constructible : integral_constant<bool, __is_trivially_constructible(T, ArgTypes...)> {};
 //TODO is_trivially_default_constructible
-  template<typename T> struct is_trivially_default_constructible : is_trivially_constructible<T> {};
+  //template<typename T> struct is_trivially_default_constructible : is_trivially_constructible<T> {};
 //TODO is_trivially_copy_constructible
-  template<typename T> struct is_trivially_copy_constructible :  is_trivially_constructible<T, const typename add_lvalue_reference<T>::type> {};
+  //template<typename T> struct is_trivially_copy_constructible :  is_trivially_constructible<T, const typename add_lvalue_reference<T>::type> {};
 //TODO is_trivially_move_constructible
-  template<typename T> struct is_trivially_move_constructible : is_trivially_constructible<T, const typename add_rvalue_reference<T>::type> {};
+  //template<typename T> struct is_trivially_move_constructible : is_trivially_constructible<T, const typename add_rvalue_reference<T>::type> {};
 
 //TODO is_trivially_assignable
   template<typename> struct is_trivially_assignable : false_type {};
