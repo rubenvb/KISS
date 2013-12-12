@@ -132,28 +132,42 @@ int main()
   test_unary_trait_cv<is_function, Class, false>();
   test_unary_trait_cv<is_function, FunctionPtr, false>();
 
-  // is_member_object_pointer
-  test_unary_trait_cv<is_member_object_pointer, int (Class::*)>();
-  test_unary_trait_cv<is_member_object_pointer, const int (Class::*)>();
-  test_unary_trait_cv<is_member_object_pointer, Class(Class::*)>();
+  // is_member_function_pointer
+  test_unary_trait_cv<is_member_pointer, void (Class::*)()>();
+  test_unary_trait_cv<is_member_pointer, int (Class::*)(int)>();
+  test_unary_trait_cv<is_member_pointer, int (Class::*)(int) const>();
+  test_unary_trait_cv<is_member_pointer, int (Class::*)(float, ...)>();
+  test_unary_trait_cv<is_member_pointer, Class (Class::*)(Class)>();
+  test_unary_trait_cv<is_member_pointer, float (Class::*)(int, float, int[], int&)>();
+  test_unary_trait_cv<is_member_pointer, int (Class::*)>();
+  test_unary_trait_cv<is_member_pointer, const int (Class::*)>();
+  test_unary_trait_cv<is_member_pointer, Class (Class::*)>();
 
-  test_unary_trait_cv<is_member_object_pointer, int (Class::*)(int), false>();
-  test_unary_trait_cv<is_member_object_pointer, int (Class::*)(int) const, false>();
-  test_unary_trait_cv<is_member_object_pointer, int (Class::*)(float, ...), false>();
-  test_unary_trait_cv<is_member_object_pointer, Class (Class::*)(Class), false>();
-  test_unary_trait_cv<is_member_object_pointer, float (Class::*)(int, float, int[], int&), false>();
-  test_unary_trait_cv<is_member_object_pointer, Class, false>();
+  test_unary_trait_cv<is_member_pointer, Class, false>();
+  test_unary_trait_cv<is_member_pointer, int*, false>();
 
   // is_member_function_pointer
-  test_unary_trait_cv<is_member_function_pointer, void (Class::*)()>();
-  test_unary_trait_cv<is_member_function_pointer, int (Class::*)(int)>();
-  test_unary_trait_cv<is_member_function_pointer, int (Class::*)(int) const>();
-  test_unary_trait_cv<is_member_function_pointer, int (Class::*)(float, ...)>();
-  test_unary_trait_cv<is_member_function_pointer, Class (Class::*)(Class)>();
-  test_unary_trait_cv<is_member_function_pointer, float (Class::*)(int, float, int[], int&)>();
+  test_unary_trait<is_member_function_pointer, void (Class::*)()>();
+  test_unary_trait<is_member_function_pointer, int (Class::*)(int)>();
+  test_unary_trait<is_member_function_pointer, int (Class::*)(int) const>();
+  test_unary_trait<is_member_function_pointer, int (Class::*)(float, ...)>();
+  test_unary_trait<is_member_function_pointer, Class (Class::*)(Class)>();
+  test_unary_trait<is_member_function_pointer, float (Class::*)(int, float, int[], int&)>();
 
-  test_unary_trait_cv<is_member_function_pointer, int (Class::*), false>();
-  test_unary_trait_cv<is_member_function_pointer, const int (Class::*), false>();
-  test_unary_trait_cv<is_member_function_pointer, Class (Class::*), false>();
-  test_unary_trait_cv<is_member_function_pointer, Class, false>();
+  test_unary_trait<is_member_function_pointer, int (Class::*), false>();
+  test_unary_trait<is_member_function_pointer, const int (Class::*), false>();
+  test_unary_trait<is_member_function_pointer, Class (Class::*), false>();
+  test_unary_trait<is_member_function_pointer, Class, false>();
+
+  // is_member_object_pointer
+  test_unary_trait<is_member_object_pointer, int (Class::*)>();
+  test_unary_trait<is_member_object_pointer, const int (Class::*)>();
+  test_unary_trait<is_member_object_pointer, Class(Class::*)>();
+
+  test_unary_trait<is_member_object_pointer, int (Class::*)(int), false>();
+  test_unary_trait<is_member_object_pointer, int (Class::*)(int) const, false>();
+  test_unary_trait<is_member_object_pointer, int (Class::*)(float, ...), false>();
+  test_unary_trait<is_member_object_pointer, Class (Class::*)(Class), false>();
+  test_unary_trait<is_member_object_pointer, float (Class::*)(int, float, int[], int&), false>();
+  test_unary_trait<is_member_object_pointer, Class, false>();
 }

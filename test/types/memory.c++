@@ -49,6 +49,7 @@ int main()
   test_unary_trait<is_trivial, Class, false>();
 
   // is_trivially_copyable
+  /*
   test_unary_trait_cv<is_trivially_copyable, int>();
   test_unary_trait_cv<is_trivially_copyable, const int>();
   test_unary_trait_cv<is_trivially_copyable, int&, false>();
@@ -57,7 +58,7 @@ int main()
   test_unary_trait_cv<is_trivially_copyable, const NotEmptyClass&, false>();
   test_unary_trait_cv<is_trivially_copyable, VirtuallyDestructibleClass, false>();
   test_unary_trait_cv<is_trivially_copyable, TriviallyCopyableClass>();
-
+  */
   // is_standard_layout
   test_unary_trait_cv<is_standard_layout, int>();
   test_unary_trait_cv<is_standard_layout, int[3]>();

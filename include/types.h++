@@ -238,22 +238,34 @@ namespace kiss
   template<typename T> struct is_class : integral_constant<bool, __is_class(typename remove_cv<T>::type)> {};
   // is_function
   template<typename> struct is_function : public false_type { };
-  template<typename Result, typename... ArgTypes> struct is_function<Result(ArgTypes...)> : public true_type { };
-  template<typename Result, typename... ArgTypes> struct is_function<Result(ArgTypes..., ...)> : public true_type { };
+  template<typename Result, typename... ArgTypes> struct is_function<Result(ArgTypes...)> : public true_type {};
+  template<typename Result, typename... ArgTypes> struct is_function<Result(ArgTypes..., ...)> : public true_type {};
+  // is_member_pointer
+  namespace implementation
+  {
+    template<typename> struct is_member_pointer : false_type {};
+    template<typename T, typename Class> struct is_member_pointer<T Class::*> : true_type {};
+  }
+  template<typename T> struct is_member_pointer : implementation::is_member_pointer<typename remove_cv<T>::type> {};
+
   // is_member_function_pointer
-  namespace implementation
-  {
-    template<typename> struct is_member_function_pointer : false_type {};
-    template <typename T, typename Class> struct is_member_function_pointer<T Class::*> : is_function<typename remove_cv<T>::type> {};
-  }
-  template<typename T> struct is_member_function_pointer : implementation::is_member_function_pointer<typename remove_reference<T>::type> {};
+  template<typename T>
+  struct is_member_function_pointer : false_type {};
+  template<typename T, typename R, typename... Args>
+  struct is_member_function_pointer<R (T::*)(Args...) const> : true_type {};
+  template<typename T, typename R, typename... Args>
+  struct is_member_function_pointer<R (T::*)(Args...)> : true_type {};
+  template<typename T, typename R, typename... Args>
+  struct is_member_function_pointer<R (T::*)(Args..., ...) const> : true_type {};
+  template<typename T, typename R, typename... Args>
+  struct is_member_function_pointer<R (T::*)(Args..., ...)> : true_type {};
   // is_member_object_pointer
-  namespace implementation
-  {
-    template<typename> struct is_member_object_pointer : false_type {};
-    template<typename T, typename Class> struct is_member_object_pointer<T Class::*> : integral_constant<bool, !is_function<T>::value> {};
-  }
-  template<typename T> struct is_member_object_pointer : implementation::is_member_object_pointer<typename remove_cv<T>::type> {};
+  template<class T>
+  struct is_member_object_pointer : integral_constant<
+                                        bool,
+                                        is_member_pointer<T>::value &&
+                                        !is_member_function_pointer<T>::value
+                                    > {};
   // is_nullptr
   namespace implementation
   {
@@ -271,13 +283,6 @@ namespace kiss
   template<typename T> struct is_arithmetic : integral_constant<bool, is_floating_point<T>() || is_integral<T>()> {};
   // is_fundamental
   template<typename T> struct is_fundamental : integral_constant<bool, is_void<T>() || is_nullptr<T>() || is_arithmetic<T>()> {};
-  // is_member_pointer
-  namespace implementation
-  {
-    template<typename> struct is_member_pointer : false_type {};
-    template<typename T, typename Class> struct is_member_pointer<T Class::*> : true_type {};
-  }
-  template<typename T> struct is_member_pointer : implementation::is_member_pointer<typename remove_cv<T>::type> {};
   // is_scalar
   template<typename T> struct is_scalar : integral_constant<bool, is_pointer<T>() || is_nullptr<T>() || is_arithmetic<T>() || is_enum<T>() || is_member_pointer<T>()> {};
   // is_object

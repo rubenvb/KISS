@@ -47,8 +47,6 @@ void test_is_not_signed()
   static_assert(!is_signed<const volatile T>(), "");
 }
 
-class Class {};
-
 int main()
 {
 //TODO CONST VOLATILE make_signed

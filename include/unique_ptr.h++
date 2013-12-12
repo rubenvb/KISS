@@ -19,7 +19,7 @@
 #define KISS_UNIQUE_PTR_H
 
 #include "config.h++"
-#include "pair.h++"
+#include "compressed_pair.h++"
 #include "types.h++"
 
 namespace kiss

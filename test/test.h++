@@ -37,6 +37,7 @@ using FunctionPtr = void(*)();
 using Function1 = void(int);
 using Function2 = void(int, double);
 class IncompleteClass;
+class NonCopyableClass { NonCopyableClass(const NonCopyableClass&) = delete; };
 class NotEmptyClass { int i; };
 class TriviallyCopyableClass { TriviallyCopyableClass(); };
 class VirtuallyDestructibleClass { int i; virtual ~VirtuallyDestructibleClass() { i=42; } };
@@ -57,12 +58,12 @@ void test_unary_trait_cv()
   static_assert(trait<const volatile U>::value == B, "");
 }
 
-template<template<typename T1, typename T2> class trait, typename U, typename V, int B = true>
+template<template<typename T1, typename T2> class trait, typename U, typename V, bool B = true>
 void test_binary_trait()
 {
   static_assert(trait<U, V>::value == B, "");
 }
-template<template<typename T1, typename T2> class trait, typename U, typename V, int B = true>
+template<template<typename T1, typename T2> class trait, typename U, typename V, bool B = true>
 void test_binary_trait_cv()
 {
   static_assert(trait<U, V>::value == B, "");

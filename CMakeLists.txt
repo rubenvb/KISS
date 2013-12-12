@@ -60,7 +60,6 @@ compile_test(types inheritance)
 compile_test(types alignment)
 
 runtime_test(utility compressed_pair)
-
-runtime_test(utility tuple)
+#runtime_test(utility tuple)
 
 runtime_test(smart_pointers unique_ptr)

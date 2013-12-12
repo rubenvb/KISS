@@ -372,15 +372,15 @@ int main()
   test_binary_trait<is_convertible, const char*, char*, false>();
   test_binary_trait<is_convertible, const char*, const char*>();
 
-  test_binary_trait<is_convertible, NonCopyable&, NonCopyable&>();
-  test_binary_trait<is_convertible, NonCopyable&, const NonCopyable&>();
-  test_binary_trait<is_convertible, NonCopyable&, const volatile NonCopyable&>();
-  test_binary_trait<is_convertible, NonCopyable&, volatile NonCopyable&>();
-  test_binary_trait<is_convertible, const NonCopyable&, const NonCopyable&>();
-  test_binary_trait<is_convertible, const NonCopyable&, const volatile NonCopyable&>();
-  test_binary_trait<is_convertible, volatile NonCopyable&, const volatile NonCopyable&>();
-  test_binary_trait<is_convertible, const volatile NonCopyable&, const volatile NonCopyable&>();
-  test_binary_trait<is_convertible, const NonCopyable&, NonCopyable&, false>();
+  test_binary_trait<is_convertible, NonCopyableClass&, NonCopyableClass&>();
+  test_binary_trait<is_convertible, NonCopyableClass&, const NonCopyableClass&>();
+  test_binary_trait<is_convertible, NonCopyableClass&, const volatile NonCopyableClass&>();
+  test_binary_trait<is_convertible, NonCopyableClass&, volatile NonCopyableClass&>();
+  test_binary_trait<is_convertible, const NonCopyableClass&, const NonCopyableClass&>();
+  test_binary_trait<is_convertible, const NonCopyableClass&, const volatile NonCopyableClass&>();
+  test_binary_trait<is_convertible, volatile NonCopyableClass&, const volatile NonCopyableClass&>();
+  test_binary_trait<is_convertible, const volatile NonCopyableClass&, const volatile NonCopyableClass&>();
+  test_binary_trait<is_convertible, const NonCopyableClass&, NonCopyableClass&, false>();
 
 //TODO is_complete
 

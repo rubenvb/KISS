@@ -14,7 +14,7 @@
  * test/utility/compressed_pair.c++
  **/
 
-#include "utility/compressed_pair.h++"
+#include "compressed_pair.h++"
 
 using namespace kiss;
 
