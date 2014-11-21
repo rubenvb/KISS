@@ -11,27 +11,26 @@
  ********************************************************************************************/
 
 /*
- * config.h++
- *  Miscellaneous configuration.
+ * utility.h++
+ *  Utility functions.
  **/
 
-#ifndef KISS_CONFIG_H
-#define KISS_CONFIG_H
+#ifndef KISS_META_UTILITY_H
+#define KISS_META_UTILITY_H
 
-#if defined(_MSC_VER) && !defined(__clang__) && !defined(__ICL)
-//#error "this shit is broken anyway"
-#define constexpr const
-#define __alignof__(type) __alignof(type)
-#define alignas(number) __declspec(align(number))
-typedef wchar_t       char16_t;
-typedef unsigned long char32_t;
-#endif
+#include "config.h++"
+#include "types.h++"
 
 namespace kiss
 {
-  constexpr int major_version = 0;
-  constexpr int minor_version = 1;
-  constexpr int version = major_version*100+minor_version;
+  template<size_type size, size_type... other_sizes>
+  struct static_max;
+
+  template<size_type size>
+  struct static_max<size> : integral_constant<size_type, size> {};
+
+  template<size_type size1, size_type size2, size_type... other_sizes>
+  struct static_max<size1, size2, other_sizes...> : integral_constant<size_type, static_max<size1 >= size2 ? size1 : size2, other_sizes...>::value> {};
 }
 
 #endif

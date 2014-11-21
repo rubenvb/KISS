@@ -425,7 +425,7 @@ int main()
 
   test_nested_type_trait_cv<result_of, pm const&(X&), int&>();
   test_nested_type_trait_cv<result_of, pmf1 const&(X&), void>();
-  test_nested_type_trait_cv<result_of, pmf2 const&(X&)>();
+  test_nested_type_trait_cv<result_of, pmf2 const&(X&), void>();
   test_nested_type_trait_cv<result_of, pm(volatile X&), volatile int&>();
-  test_nested_type_trait_cv<result_of, pmf2(volatile X&)>();
+  test_nested_type_trait_cv<result_of, pmf2(volatile X&), void>();
 }

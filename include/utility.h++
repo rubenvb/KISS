@@ -19,11 +19,5 @@
 #define KISS_UTILITY_H
 
 #include "config.h++"
-#include "types.h++"
-
-namespace kiss
-{
-
-}
 
 #endif

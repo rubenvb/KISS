@@ -37,63 +37,65 @@ inline void swap(TupleLeaf<index, Type, empty>& a, TupleLeaf<index, Type, empty>
   swap(a.get(), b.get());
 }
 
-template <size_type I_, typename ValueType_, bool IsEmpty_>
+template <size_type index, typename Type, bool empty>
 class TupleLeaf {
-  ValueType_ value_;
+  Type value;
 
   TupleLeaf& operator=(const TupleLeaf&) = delete;
 public:
   TupleLeaf()
-  : value_() {
-    static_assert(!is_reference<ValueType_>::value,
-    "Attempt to default construct a reference element in a tuple");
+  : value()
+  {
+    static_assert(!is_reference<Type>::value, "Attempt to default construct a reference element in a tuple.");
   }
 
   TupleLeaf(const TupleLeaf& t)
-  : value_(t.get()) {
-    static_assert(!is_rvalue_reference<ValueType_>::value,
-    "Can not copy a tuple with rvalue reference member");
+  : value(t.get())
+  {
+    static_assert(!is_rvalue_reference<Type>::value, "Cannot copy a tuple with rvalue reference member.");
   }
 
-  template <typename T, typename = typename enable_if<
-  is_constructible<ValueType_, T>::value>::type>
+  template <typename T, typename = enable_if<is_constructible<Type, T>::value>>
   explicit TupleLeaf(T&& t)
-  : value_(forward<T>(t)) {
-    static_assert(!is_reference<ValueType_>::value ||
-    (is_lvalue_reference<ValueType_>::value &&
-    (is_lvalue_reference<T>::value ||
+  : value(forward<T>(t))
+  {
+    static_assert(!is_reference<Type>::value
+                  || (is_lvalue_reference<Type>::value && (is_lvalue_reference<T>::value ||
     is_same<typename remove_reference<T>::type,
     reference_wrapper<
-    typename remove_reference<ValueType_>::type
+    typename remove_reference<Type>::type
     >
-    >::value)) ||
-    (is_rvalue_reference<ValueType_>::value &&
+    >::value)) ||ator
+
+    (is_rvalue_reference<Type>::value &&
     !is_lvalue_reference<T>::value),
     "Attempted to construct a reference element in a tuple with an rvalue");
   }
 
   template <typename T>
-  explicit TupleLeaf(const TupleLeaf<I_, T>& t)
-  : value_(t.get()) {
-  }
+  explicit TupleLeaf(const TupleLeaf<index, T>& t)
+  : value(t.get()) {}
 
   template <typename T>
-  TupleLeaf& operator=(T&& t) {
-    value_ = forward<T>(t);
+  TupleLeaf& operator=(T&& t)
+  {
+    value = forward<T>(t);
     return *this;
   }
 
-  int swap(TupleLeaf& t) {
-    migl2::detail::swap(*this, t);
+  int swap(TupleLeaf& t)
+  {
+    swap(*this, t);
     return 0;
   }
 
-  ValueType_& get() {
-    return value_;
+  Type& get()
+  {
+    return value;
   }
 
-  const ValueType_& get() const {
-    return value_;
+  const Type& get() const {
+    return value;
   }
 };
 

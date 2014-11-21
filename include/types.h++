@@ -113,6 +113,7 @@ namespace kiss
     template<bool, typename First, typename Second> struct conditional { using type = First; };
     template<typename First, typename Second> struct conditional<false, First, Second> { using type = Second; };
   }
+  //template<bool B, typename First, typename Second> using conditional = typename implementation::conditional<B, First, Second>;
   template<bool B, typename First, typename Second> using conditional = typename implementation::conditional<B, First, Second>::type;
 
   // declval
@@ -249,16 +250,29 @@ namespace kiss
   template<typename T> struct is_member_pointer : implementation::is_member_pointer<typename remove_cv<T>::type> {};
 
   // is_member_function_pointer
+  namespace implementation
+  {
+    template<typename T>
+    struct is_member_function_pointer : false_type {};
+    template<typename T, typename R, typename... Args>
+    struct is_member_function_pointer<R (T::*)(Args...)> : true_type {};
+    template<typename T, typename R, typename... Args>
+    struct is_member_function_pointer<R (T::*)(Args...) const> : true_type {};
+    template<typename T, typename R, typename... Args>
+    struct is_member_function_pointer<R (T::*)(Args...) volatile> : true_type {};
+    template<typename T, typename R, typename... Args>
+    struct is_member_function_pointer<R (T::*)(Args...) const volatile> : true_type {};
+    template<typename T, typename R, typename... Args>
+    struct is_member_function_pointer<R (T::*)(Args..., ...)> : true_type {};
+    template<typename T, typename R, typename... Args>
+    struct is_member_function_pointer<R (T::*)(Args..., ...) const> : true_type {};
+    template<typename T, typename R, typename... Args>
+    struct is_member_function_pointer<R (T::*)(Args..., ...) volatile> : true_type {};
+    template<typename T, typename R, typename... Args>
+    struct is_member_function_pointer<R (T::*)(Args..., ...) const volatile> : true_type {};
+  }
   template<typename T>
-  struct is_member_function_pointer : false_type {};
-  template<typename T, typename R, typename... Args>
-  struct is_member_function_pointer<R (T::*)(Args...) const> : true_type {};
-  template<typename T, typename R, typename... Args>
-  struct is_member_function_pointer<R (T::*)(Args...)> : true_type {};
-  template<typename T, typename R, typename... Args>
-  struct is_member_function_pointer<R (T::*)(Args..., ...) const> : true_type {};
-  template<typename T, typename R, typename... Args>
-  struct is_member_function_pointer<R (T::*)(Args..., ...)> : true_type {};
+  struct is_member_function_pointer : implementation::is_member_function_pointer<T> {};
   // is_member_object_pointer
   template<class T>
   struct is_member_object_pointer : integral_constant<
@@ -324,7 +338,8 @@ namespace kiss
       constexpr operator bool() { return value; }
     };
   }
-  template<typename From, typename To> struct is_convertible : implementation::is_convertible<From, To> {};
+  template<typename From, typename To> struct is_convertible// : implementation::is_convertible<From, To> {};
+                : implementation::is_convertible<conditional<is_void<From>::value, void, From>, conditional<is_void<To>::value, void, To>> {};
   /*template<typename From, typename To> struct is_convertible : conditional<is_void<From>::value || is_void<To>::value,
                                                                            conditional<is_void<To>::value && is_void<From>::value,
                                                                                        true_type,
@@ -461,17 +476,14 @@ namespace kiss
   template<typename T, size_type N> struct remove_all_extents<T[N]> { using type = typename remove_all_extents<T>::type; };
 
   // decay
-  template <class T>
-  struct decay
-  {
-  private:
-    using U = typename remove_reference<T>::type;
-  public:
-    using type = conditional<is_c_array<U>::value,
-                             typename remove_extent<U>::type*,
-                             conditional<is_function<U>::value,
-                                         typename add_pointer<U>::type,
-                                         typename remove_cv<U>::type>>;
+  template< class T >
+  struct decay {
+      using U = typename remove_reference<T>::type;
+      using type = conditional<is_c_array<U>::value,
+                               typename remove_extent<U>::type*,
+                               conditional<is_function<U>::value,
+                                           typename add_pointer<U>::type,
+                                           typename remove_cv<U>::type>>;
   };
 
 /*

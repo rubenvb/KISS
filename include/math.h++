@@ -22,23 +22,9 @@
 #include "error.h++"
 #include "types.h++"
 
-// define template for all overloads; better than templates usability-wise
-
-
-#define OVERLOAD_FLOAT_MATH_FUNCTION(function) \
-  inline float function(float x) { return C::function##f(x); } \
-  inline double function(double x) { return C::function(x); } \
-  inline long double function(long double x) { return C::function##l(x); }
-#define OVERLOAD_INT_MATH_FUNCTION(function) \
-  inline int function(int x) { return C::function(x); } \
-  inline long int function(long int x) { return C::##ll##function(x); } \
-  inline long long int function(long long int x) { return C::##ll##function(x); }
-
 namespace kiss
 {
-/*
- * These are taken directly from the C Standard and prevents necessary inclusion of a C header
- **/
+// These are taken directly from the C Standard and prevents necessary inclusion of a C header
   namespace C
   {
     extern "C"
@@ -270,15 +256,13 @@ namespace kiss
     float fminf(float x, float y);
     long double fminl(long double x, long double y);
 
-    // Floating multiply-add
+    // Fused multiply-add
     double fma(double x, double y, double z);
     float fmaf(float x, float y, float z);
     long double fmal(long double x, long double y, long double z);
     }
   }
-/*
- * Trigonometric functions
- */
+  // Trigonometric functions
   inline float acos(float x) { return C::acosf(x); } \
   inline double acos(double x) { return C::acos(x); } \
   inline long double acos(long double x) { return C::acosl(x); }

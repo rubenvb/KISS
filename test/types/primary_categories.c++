@@ -150,6 +150,7 @@ int main()
   test_unary_trait<is_member_function_pointer, void (Class::*)()>();
   test_unary_trait<is_member_function_pointer, int (Class::*)(int)>();
   test_unary_trait<is_member_function_pointer, int (Class::*)(int) const>();
+  test_unary_trait<is_member_function_pointer, int (Class::*)(int) volatile>();
   test_unary_trait<is_member_function_pointer, int (Class::*)(float, ...)>();
   test_unary_trait<is_member_function_pointer, Class (Class::*)(Class)>();
   test_unary_trait<is_member_function_pointer, float (Class::*)(int, float, int[], int&)>();
