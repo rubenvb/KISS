@@ -1,5 +1,5 @@
 /**
- * Written in 2014 by Ruben Van Boxem <vanboxem.ruben@gmail.com>
+ * Written in 2014-2015 by Ruben Van Boxem <vanboxem.ruben@gmail.com>
  *
  * To the extent possible under law, the author(s) have dedicated all copyright and related
  * and neighboring rights to this software to the public domain worldwide. This software is
@@ -19,13 +19,16 @@
 #define KISS_VARIANT_H
 
 #include "config.h++"
+
+#include "aligned_union.h++"
 #include "utility.h++"
 
-template<typename... Types>
-class variant
+namespace kiss
 {
-  aligned_union
-};
-
+  template<typename... Types>
+  class variant : aligned_union<static_max<sizeof...(Types)>::value, Types...>
+  {
+  };
+}
 
 #endif

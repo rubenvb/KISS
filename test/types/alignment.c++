@@ -1,5 +1,5 @@
 /**
- * Written in 2013 by Ruben Van Boxem <vanboxem.ruben@gmail.com>
+ * Written in 2013-2015 by Ruben Van Boxem <vanboxem.ruben@gmail.com>
  *
  * To the extent possible under law, the author(s) have dedicated all copyright and related
  * and neighboring rights to this software to the public domain worldwide. This software is
@@ -25,8 +25,8 @@ int main()
   // alignment_of
   test_unary_trait_cv<alignment_of, int&, 4>();
   test_unary_trait_cv<alignment_of, Class, 1>();
-  test_unary_trait_cv<alignment_of, int*, sizeof(long) == 4 ? 4 : 8>();
-  test_unary_trait_cv<alignment_of, const int*, sizeof(long) == 4 ? 4 : 8>();
+  test_unary_trait_cv<alignment_of, int*, sizeof(void*) == 4 ? 4 : 8>();
+  test_unary_trait_cv<alignment_of, const int*, sizeof(void*) == 4 ? 4 : 8>();
   test_unary_trait_cv<alignment_of, char[3], 1>();
   test_unary_trait_cv<alignment_of, int, 4>();
   test_unary_trait_cv<alignment_of, double, 8>();
@@ -71,7 +71,8 @@ int main()
   static_assert(sizeof(T9) == 16, "");
 
 //TODO default argument and tests need checking
-  /*using T10 = aligned_storage<1>::type;
+  /*
+  using T10 = aligned_storage<1>::type;
   test_unary_trait_cv<alignment_of, T10, 1>();
   static_assert(sizeof(T10) == 1, "");
 
@@ -117,5 +118,6 @@ int main()
 
   using T21 = aligned_storage<10>::type;
   test_unary_trait_cv<alignment_of, T21, 8>();
-  static_assert(sizeof(T21) == 16, "");*/
+  static_assert(sizeof(T21) == 16, "");
+  */
 }

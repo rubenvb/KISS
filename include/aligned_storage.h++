@@ -11,27 +11,28 @@
  ********************************************************************************************/
 
 /*
- * aligned_union.h++
- *  Provides aligned polymorphic memory.
+ * aligned_storage.h++
+ *  Provides aligned memory.
  **/
 
-#ifndef KISS_ALIGNED_UNION_H
-#define KISS_ALIGNED_UNION_H
+#ifndef KISS_ALIGNED_STORAGE_H
+#define KISS_ALIGNED_STORAGE_H
 
 #include "config.h++"
-
-#include "aligned_storage.h++"
 #include "meta_utility.h++"
+#include "types.h++"
 
 namespace kiss
 {
-  template<size_type minimum_size, typename... Types>
-  struct aligned_union
+  //TODO aligned_storage - needs default argument
+  namespace implementation
   {
-    static constexpr const size_type alignment = static_max<alignof(Types)...>::value;
-    static constexpr const size_type size = static_max<minimum_size, sizeof(Types)...>::value;
-    using type = typename aligned_storage<size, alignment>::type;
-  };
+    template<size_type size>
+    struct arraystruct { char array[size]; };
+  }
+  template<size_type size, size_type alignment = alignof(implementation::arraystruct<size>)>
+  struct aligned_storage
+  { using type = struct { alignas(alignment) unsigned char data[size]; }; };
 }
 
 #endif
