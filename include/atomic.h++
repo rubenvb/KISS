@@ -13,6 +13,7 @@
 /*
  * atomic.h++
  *  KISS atomics.
+ *  https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
  **/
 
 #ifndef KISS_ATOMIC_H
@@ -25,15 +26,27 @@ namespace kiss
   namespace atomic
   {
   /*
+   * Operation ordering
+   **/
+    enum order
+    {
+      relaxed,
+      consume,
+      acquire,
+      release,
+      acquire_release,
+      sequentially_consistent
+    };
+  /*
    * arithmetic
    **/
-    template<typename T> inline T increment(T& t) noexcept
+    template<typename T> inline T increment(T& t, order o = sequentially_consistent) noexcept
     {
-      return __sync_add_and_fetch(&t, 1);
+      return __atomic_add_fetch(&t, 1, o);
     }
-    template<typename T> inline T decrement(T& t) noexcept
+    template<typename T> inline T decrement(T& t, order o = sequentially_consistent) noexcept
     {
-      return __sync_add_and_fetch(&t, -1);
+      return __atomic_sub_fetch(&t, -1, o);
     }
   }
 }
