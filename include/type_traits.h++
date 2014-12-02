@@ -262,8 +262,66 @@ namespace kiss
   template<typename T, typename U> struct common_type<T, U> { using type = decltype(true ? declval<T>() : declval<U>()); };
   template<typename T, typename U, typename... V> struct common_type<T, U, V...> { using type = typename common_type<typename common_type<T, U>::type, V...>::type; };
 
-  // is_convertible
   namespace implementation
+  {
+    template <class F, class... Args>
+    inline auto INVOKE(F&& f, Args&&... args) -> decltype(forward<F>(f)(forward<Args>(args)...))
+    {
+      return forward<F>(f)(forward<Args>(args)...);
+    }
+
+    template <class Base, class T, class Derived>
+    inline auto INVOKE(T Base::*&& pmd, Derived&& ref) -> decltype(forward<Derived>(ref).*forward<T Base::*>(pmd))
+    {
+      return forward<Derived>(ref).*forward<T Base::*>(pmd);
+    }
+
+    template<class PMD, class Pointer>
+    inline auto INVOKE(PMD&& pmd, Pointer&& ptr) -> decltype((*forward<Pointer>(ptr)).*forward<PMD>(pmd))
+    {
+      return (*forward<Pointer>(ptr)).*forward<PMD>(pmd);
+    }
+
+    template<class Base, class T, class Derived, class... Args>
+    inline auto INVOKE(T Base::*&& pmf, Derived&& ref, Args&&... args) -> decltype((forward<Derived>(ref).*forward<T Base::*>(pmf))(forward<Args>(args)...))
+    {
+      return (forward<Derived>(ref).*forward<T Base::*>(pmf))(forward<Args>(args)...);
+    }
+
+    template<class PMF, class Pointer, class... Args>
+    inline auto INVOKE(PMF&& pmf, Pointer&& ptr, Args&&... args) -> decltype(((*forward<Pointer>(ptr)).*forward<PMF>(pmf))(forward<Args>(args)...))
+    {
+      return ((*forward<Pointer>(ptr)).*forward<PMF>(pmf))(forward<Args>(args)...);
+    }
+
+    template<class F, class... ArgTypes>
+    struct invokeable {
+        template <typename U = F>
+        static auto test(int) -> decltype(INVOKE(
+            declval<U>(), declval<ArgTypes>()...
+        ), void(), true_type());
+
+        static auto test(...) -> false_type;
+
+        static constexpr bool value = decltype(test(0))::value;
+    };
+
+    template<bool B, class F, class... ArgTypes>
+    struct result_of
+    {
+      using type = decltype(INVOKE(declval<F>(), declval<ArgTypes>()...));
+    };
+
+    template <class F, class... ArgTypes>
+    struct result_of<false, F, ArgTypes...> {};
+  } // namespace implementation
+
+
+
+  // is_convertible
+  template<typename From, typename To>
+  struct is_convertible : integral_constant<bool, __is_convertible_to(From, To)> {};
+  /*namespace implementation
   {
     template<typename From, typename To> struct is_convertible;
     template<> struct is_convertible<void, void> : true_type {};
@@ -284,7 +342,7 @@ namespace kiss
     };
   }
   template<typename From, typename To> struct is_convertible// : implementation::is_convertible<From, To> {};
-                : implementation::is_convertible<conditional<is_void<From>::value, void, From>, conditional<is_void<To>::value, void, To>> {};
+                : implementation::is_convertible<conditional<is_void<From>::value, void, From>, conditional<is_void<To>::value, void, To>> {};*/
   /*template<typename From, typename To> struct is_convertible : conditional<is_void<From>::value || is_void<To>::value,
                                                                            conditional<is_void<To>::value && is_void<From>::value,
                                                                                        true_type,
@@ -359,6 +417,8 @@ namespace kiss
   //template<typename Function, typename... ArgTypes>
   //struct result_of<Function(ArgTypes...)> { using type = decltype(declval<typename remove_cv<typename remove_reference<Function>::type>::type>()(declval<ArgTypes>()...)); };
 
+  template<typename T>
+  struct is_final : integral_constant<bool, __is_final(T)> {};
 /*
  * Signedness
  **/

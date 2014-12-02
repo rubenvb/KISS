@@ -22,7 +22,11 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -pedantic-errors -Wextra -Wconversion -Wuninitia
 endif()
 
 # Library
-file(GLOB library_source src/*.c++)
+file(GLOB library_source src/*.c++
+                         README.md
+                         Copying.txt
+                         test/LICENSE.txt
+                         test/CREDITS.txt)
 file(GLOB library_headers include/*.h++)
 add_library(KISS ${library_headers} ${library_source})
 set_target_properties(KISS PROPERTIES LINKER_LANGUAGE CXX)

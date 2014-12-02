@@ -10,17 +10,17 @@ It adds things missing from the C++11 Standard library where applicable.
 It leans on basic C library functions only when needed (e.g. math function, low level file operations...).
 No file in KISS includes C header files to prevent namespace contamination.
 
-Currently GCC 4.8+ and Clang 3.2+ are supported.
+Currently GCC and Clang are supported.
 
 To build, do
 cmake
-make
+[g,mingw32-,n]make
 
 To run the tests, do
 ctest
 
-Current progress:
- - math.h++ contains C math functions wrapped in overloaded functions for each relevant type.
- - pair.h++ contains a compressed pair implementation that uses the Empty Base Class optimization for empty types.
- - types.h++ contains most type traits, but most lack tests so the untested ones may be wrong.
-    The libc++ test suite is being used as a base to test these.
+Implementation details:
+ - No language reserved identifiers were used.
+ - The libc++ test suite is being used as a base for the tests,
+   and all test code falls under the libc++ license, and may have been adapted to allow extensions or different behaviour.
+ - For math functions, the C library math is used. Nonetheless, any other C functions are not used.

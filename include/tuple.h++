@@ -32,7 +32,7 @@ namespace kiss
 template<typename... Types>
 class Tuple;
 
-template<size_type index, typename T, bool empty = is_empty<T>::value && !__is_final(T)>
+template<size_type index, typename T, bool empty = is_empty<T>::value && !is_final<T>::value>
 class TupleLeaf;
 
 template<size_type index, typename T, bool empty>
