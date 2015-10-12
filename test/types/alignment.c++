@@ -10,6 +10,7 @@
  * test/types/alignment.c++
  **/
 
+#include "aligned_storage.h++"
 #include "type_traits.h++"
 
 #include "../test.h++"

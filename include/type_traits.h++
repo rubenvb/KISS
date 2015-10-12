@@ -319,9 +319,9 @@ namespace kiss
 
 
   // is_convertible
-  template<typename From, typename To>
-  struct is_convertible : integral_constant<bool, __is_convertible_to(From, To)> {};
-  /*namespace implementation
+  // template<typename From, typename To>
+  //struct is_convertible : integral_constant<bool, __is_convertible_to(From, To)> {};
+  namespace implementation
   {
     template<typename From, typename To> struct is_convertible;
     template<> struct is_convertible<void, void> : true_type {};
@@ -342,7 +342,7 @@ namespace kiss
     };
   }
   template<typename From, typename To> struct is_convertible// : implementation::is_convertible<From, To> {};
-                : implementation::is_convertible<conditional<is_void<From>::value, void, From>, conditional<is_void<To>::value, void, To>> {};*/
+                : implementation::is_convertible<conditional<is_void<From>::value, void, From>, conditional<is_void<To>::value, void, To>> {};
   /*template<typename From, typename To> struct is_convertible : conditional<is_void<From>::value || is_void<To>::value,
                                                                            conditional<is_void<To>::value && is_void<From>::value,
                                                                                        true_type,
@@ -371,21 +371,6 @@ namespace kiss
 
   //template<typename T> struct is_convertible<Array[], Array[]> : false_type{};
   template<typename T, size_type N> struct is_convertible<T[N], T[N]> : false_type{}; // !is_convertible<Array, Array>
-
-  // is_complete
-  template<typename T, typename... Ts>
-  struct is_complete
-  {
-  private:
-    template<unsigned...> static constexpr void foo();
-    template<typename... Us>
-    static auto test(int) -> decltype(foo<sizeof(Us)...>(), void(), true_type{});
-    template<typename...>
-    static auto test(...) -> false_type;
-  public:
-    static constexpr bool value = decltype(test<T, Ts...>(0))::value;
-    constexpr operator bool() { return value; }
-  };
 
 //TODO is_polymorphic_functor
   //    template<typename T>
@@ -512,7 +497,6 @@ namespace kiss
   // is_constructible
   template<typename T, typename... Args> struct is_constructible
   {
-    static_assert(is_complete<T, Args...>(), "is_constructible can only be used with complete types");
     template<typename F>
     static auto test(int) -> decltype(T(declval<Args>()...), void(), true_type{});
     template<typename>
@@ -550,13 +534,13 @@ namespace kiss
 
 //TODO is_assignable
   template<typename T, typename U> struct is_assignable : false_type
-  { static_assert(is_complete<T>() && is_complete<U>(), "is_assignable can only be used with complete types"); };
+  {};
   // is_copy_assignable
   template<typename T> struct is_copy_assignable : is_assignable<T&, const T&>
-  { static_assert(is_complete<T>(), "is_copy_assignable can only be used with a complete type"); };
+  {};
   // is_move_assignable
   template<typename T> struct is_move_assignable : is_assignable<T&, T&&>
-  { static_assert(is_complete<T>(), "is_move_assignable can only be used with a complete type"); };
+  {};
 
 //TODO is_trivially_constructible
   // not in GCC 4.8.1
@@ -602,25 +586,34 @@ namespace kiss
 //TODO INTRINSIC underlying_type
   template<typename T> struct underlying_type { using type = __underlying_type(T); };
 //TODO INTRINSIC has_virtual_destructor
-  template<typename T> struct has_virtual_destructor : integral_constant<bool, __has_virtual_destructor(T)> {};
+  //template<typename T> struct has_virtual_destructor : integral_constant<bool, __has_virtual_destructor(T)> {};
 //TODO INTRINSIC is_base_of
-  template<typename Base, typename Class> struct is_base_of : integral_constant<bool, __is_base_of(Base, Class)> {};
+  //template<typename Base, typename Class> struct is_base_of : integral_constant<bool, __is_base_of(Base, Class)> {};
   // this fails for private/virtual inheritance, intrinsic required
-  //template<typename Base, typename Class> struct is_base_of
-  //{
-  //  static void foo(Base*);
-  //  template<class F>
-  //  static auto test(int) -> decltype(foo(declval<F*>()), true_type{});
-  //  template<class>
-  //  static auto test(...) -> false_type;
-  //
-  //  static constexpr bool value = decltype(test<Class>(0))();
-  //  constexpr operator bool() { return value; }
-  //};
+  template<typename Base, typename Class> struct is_base_of
+  {
+    static void foo(Base*);
+    template<class F>
+    static auto test(int) -> decltype(foo(declval<F*>()), true_type{});
+    template<class>
+    static auto test(...) -> false_type;
+
+    static constexpr bool value = decltype(test<Class>(0))();
+    constexpr operator bool() { return value; }
+  };
   // is_empty
   template<typename T> struct is_empty : integral_constant<bool, __is_empty(T)> {};
   // is_polymorphic
-  template<typename T> struct is_polymorphic : integral_constant<bool, __is_polymorphic(T)> {};
+  namespace implementation
+  {
+    template<typename T> constexpr bool is_polymorphic(const T& r)
+    {
+      bool result = false;
+      typeid(result = true, r); // typeid is only evaluated if r is indeed polymorphic
+      return result;
+    }
+  }
+  template<typename T> struct is_polymorphic : integral_constant<bool, implementation::is_polymorphic(declval<T>())> {};
   // is_abstract
   template<typename T> struct is_abstract : integral_constant<bool, __is_abstract(T)> {};
 

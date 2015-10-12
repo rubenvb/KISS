@@ -69,9 +69,47 @@ namespace kiss
  * fail to compile so here are the preprocessor defines to prevent double
  * declaration for GCC's libstdc++ and LLVM's libc++
  **/
-#if !defined(_LIBCPP_INITIALIZER_LIST) && !defined(_INITIALIZER_LIST)
-#define _LIBCPP_INITIALIZER_LIST
-#define _INITIALIZER_LIST
+// g++ requires the definition matches exactly
+#ifdef __GNUG__
+namespace std
+{
+  template<class E>
+  class initializer_list
+  {
+  public:
+    typedef E 		value_type;
+    typedef const E& 	reference;
+    typedef const E& 	const_reference;
+    typedef kiss::size_type 		size_type;
+    typedef const E* 	iterator;
+    typedef const E* 	const_iterator;
+
+  private:
+    iterator			array;
+    size_type			len;
+
+    // The compiler can call a private constructor.
+    constexpr initializer_list(const_iterator a, size_type l)
+    : array(a), len(l) { }
+
+  public:
+    constexpr initializer_list() noexcept
+    : array(0), len(0) { }
+
+    // Number of elements.
+    constexpr size_type
+    size() const noexcept { return len; }
+
+    // First element.
+    constexpr const_iterator
+    begin() const noexcept { return array; }
+
+    // One past the last element.
+    constexpr const_iterator
+    end() const noexcept { return begin() + size(); }
+  };
+}
+#elif defined(__clang__)
 /*
  * initializer_list type for brace-intializer-lists C++11 requires this in namespace std, unfortunately
  */
@@ -96,11 +134,11 @@ namespace std
   template<typename E> const E* end(initializer_list<E> il)
   { return il.end(); }
 }
+#endif
 namespace kiss
 {
   template<typename T> using initializer_list = std::initializer_list<T>;
 }
-#endif
 
 /*
  * This defines the type_info struct, also bound to the implementation, required for the typeid keyword
